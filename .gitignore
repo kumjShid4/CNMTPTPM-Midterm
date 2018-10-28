@@ -59,3 +59,9 @@ typings/
 
 # next.js build output
 .next
+
+#Visual Studio Code
+.vscode
+
+#Local history on Visual Studio Code
+.history
