@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+
+    <title>Request Management</title>
+    <style>
+        body, html {
+            width: 100%;
+            height: 100%;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+<body>
+    <div style="width: 90%; height: 40%; overflow: auto;">
+        <table>
+            <thead>
+                <tr>
+                <th>Thời gian nhận</th>
+                <th>Họ tên/Số điện thoại</th>
+                <th>Địa chỉ đón khách</th>
+                <th>Ghi chú</th>
+                <th>Tài xế</th>
+                <th>Trạng thái</th>
+                <th>Định vị</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>30th Oct 2018, 10:57</td>
+                    <td>Name<br>Phone</td>
+                    <td>Địa chỉ gốc</td>
+                    <td>...</td>
+                    <td></td>
+                    <td style="color: red"><b>Chưa được định vị</b></td>
+                    <td><button>Định vị</button></td>
+                </tr>
+                <tr>
+                    <td>30th Oct 2018, 10:56</td>
+                    <td>Name<br>Phone</td>
+                    <td>Địa chỉ gốc</td>
+                    <td>...</td>
+                    <td></td>
+                    <td style="color: blue; "><b>Đã định vị xong</b></td>
+                    <td><button>Định vị</button></td>
+                </tr>
+                <tr>
+                    <td>30th Oct 2018, 10:55</td>
+                    <td>Name<br>Phone</td>
+                    <td>Địa chỉ gốc</td>
+                    <td>...</td>
+                    <td>Họ tên:<br>SĐT:<br>Địa chỉ:</td>
+                    <td><b>Đã có xe nhận</b></td>
+                    <td><button>Định vị</button></td>
+                </tr>
+                <tr>
+                    <td>30th Oct 2018, 10:48</td>
+                    <td>Name<br>Phone</td>
+                    <td>Địa chỉ gốc</td>
+                    <td>...</td>
+                    <td>Họ tên:<br>SĐT:<br>Địa chỉ:</td>
+                    <td style="color: yellowgreen"><b>Đang di chuyển</b></td>
+                    <td><button>Định vị</button></td>
+                </tr>
+                <tr>
+                    <td>30th Oct 2018, 10:37</td>
+                    <td>Name<br>Phone</td>
+                    <td>Địa chỉ gốc</td>
+                    <td>...</td>
+                    <td>Họ tên:<br>SĐT:<br>Địa chỉ:</td>
+                    <td style="color: green"><b>Đã hoàn thành</b></td>
+                    <td><button>Định vị</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id='map' style='width: 100%; height: 100%;'></div>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoibmdvcGh1b2NoYWkiLCJhIjoiY2pudWhzaW5iMDAwZTN3bzlpbnpsajZvZiJ9.4ebZJ2M76GlvJRWd-j6EHw';
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v9'
+        });
+    </script>
+</body>
+</html>
