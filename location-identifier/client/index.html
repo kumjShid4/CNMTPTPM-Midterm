@@ -149,13 +149,13 @@
 
   <script id="template" type="text/x-handlebars-template">
       {{#each this}}
-      <tr id="{{id}}">
-        <td id="name{{id}}">{{hoten}}</td>
-        <td id="sdt{{id}}">{{sdt}}</td>
-        <td id="addr{{id}}" class="{{id}}"><a class="dinhvi" href="javascript:;" style="color: #00B140;">{{diachi}}</a></td>
-        <td id="note{{id}}">{{ghichu}}</td>
-        <td id="newAddr{{id}}">{{diachimoi}}</td>
-        <td id="status{{id}}">{{trangthai}}</td>
+      <tr id="{{Id}}">
+        <td id="name{{Id}}">{{Name}}</td>
+        <td id="sdt{{Id}}">{{Phone}}</td>
+        <td id="addr{{Id}}" class="{{Id}}"><a class="dinhvi" href="javascript:;" style="color: #00B140;">{{Address}}</a></td>
+        <td id="note{{Id}}">{{Note}}</td>
+        <td id="newAddr{{Id}}">{{NewAddress}}</td>
+        <td id="status{{Id}}">{{Status}}</td>
       </tr>
       {{/each}}
   </script>

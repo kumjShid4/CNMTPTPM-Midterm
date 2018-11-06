@@ -20,35 +20,36 @@
         </div>
         <div id="main" class="row">
             <div class="col-9 offset-3 col-md-6 offset-md-4">
-                <form>
+                <form action="/data" method="POST">
                     <div class="row">
                         <div class="col-12">
                             <div class="form-group">
                                 <label>Họ Tên</label>
-                                <input class="form-control" name="hoten" placeholder="Họ Tên">
+                                <input type="text" class="form-control" name="Name" placeholder="Họ Tên">
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
                                 <label>Số Điện Thoại</label>
-                                <input class="form-control" name="sdt" placeholder="Số Điện Thoại">
+                                <input type="text" class="form-control" name="Phone" placeholder="Số Điện Thoại">
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
                                 <label>Địa Chỉ Đón</label>
-                                <input class="form-control" name="diachi" placeholder="Địa Chỉ Đón">
+                                <input type="text" class="form-control" name="Address" placeholder="Địa Chỉ Đón">
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
                                 <label>Ghi Chú</label>
-                                <input class="form-control" name="ghichu" placeholder="Ghi Chú">
+                                <input type="text" class="form-control" id="note" name="Note" placeholder="Ghi Chú">
+                                <input type="hidden" class="form-control" name="Status" value="Chưa định vị">
                             </div>
                         </div>
                         <div class="col-9 offset-3">
                             <div class="form-group">
-                                <a class="btn btn-lg btn-outline-success">ĐẶT NGAY</a>
+                                <button type="submit" class="btn btn-lg btn-outline-success">ĐẶT NGAY</button>
                             </div>
                         </div>
                     </div>

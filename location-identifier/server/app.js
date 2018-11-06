@@ -1,14 +1,15 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
     morgan = require('morgan'),
-    cors = require('cors'),
-    path = require('path');
+    cors = require('cors');
 var app = express();
 var controller = require('./controllers/controller');
 
 app.use(morgan('dev'));
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 app.use(bodyParser.json());
-
 app.get('/', (req, res) => {
     res.sendFile('index.html', {
       root: __dirname + "./../client"

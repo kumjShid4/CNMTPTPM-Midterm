@@ -2,9 +2,26 @@ var express = require('express');
 var datetime = require('date-and-time');
 var router = express.Router();
 var request = [];
+var pool = require('../db/db').pool;
 
+function realtime() {
+    pool.getConnection(function (err, connection) {
+        // Use the connection
+        connection.query('SELECT * FROM requests', function (error, results, fields) {
+            request = results;
+            console.log(results);
+            connection.release();
+
+            // Handle error after the release.
+            if (error) throw error;
+
+            // Don't use the connection here, it has been returned to the pool.
+        });
+    });
+}
 //get request
 router.get('/', (req, res) => {
+    realtime();
     var id = 0;
     if (req.query.id) {
         id = +req.query.id;
@@ -12,7 +29,7 @@ router.get('/', (req, res) => {
 
     var loop = 0;
     var fn = () => {
-        var requests = request.filter(r => r.id > id);
+        var requests = request.filter(r => r.Id > id);
         console.log(requests.length)
         var max_id = request.length;
         if (requests.length > 0) {
@@ -31,22 +48,21 @@ router.get('/', (req, res) => {
             }
         }
     }
-
     fn();
 })
 
 //nhận request
-router.post('/', (req, res) => {
-    var data = req.body;
-    data['id'] = request.length + 1; //id
-    data['thoigiannhan'] = datetime.format(new Date(), 'DD-MM-YYYY, HH:mm:ss');
-    data['trangthai'] = "Chưa định vị";
-    data["diachimoi"] = null;
-    request.push(data);
-    console.log(data);
-    res.statusCode = 200;
-    res.json({ 'a': "ok" });
-})
+// router.post('/', (req, res) => {
+//     var data = req.body;
+//     data['id'] = request.length + 1; //id
+//     data['thoigiannhan'] = datetime.format(new Date(), 'DD-MM-YYYY, HH:mm:ss');
+//     data['trangthai'] = "Chưa định vị";
+//     data["diachimoi"] = null;
+//     request.push(data);
+//     console.log(data);
+//     res.statusCode = 200;
+//     res.json({ 'a': "ok" });
+// })
 
 //định vị request
 router.post('/update', (req, res) => {
@@ -55,8 +71,7 @@ router.post('/update', (req, res) => {
         id = +req.body.id;
     }
     if (request.some(r => r.id === id)) {
-        if (request[id - 1]['trangthai'] === "Chưa định vị")
-        {
+        if (request[id - 1]['trangthai'] === "Chưa định vị") {
             request[id - 1]['trangthai'] = "Đã định vị";
         }
         res.statusCode = 200;
@@ -64,7 +79,7 @@ router.post('/update', (req, res) => {
     }
     else {
         res.statusCode = 404;
-        res.json({"status": "not found"});
+        res.json({ "status": "not found" });
     }
 })
 
