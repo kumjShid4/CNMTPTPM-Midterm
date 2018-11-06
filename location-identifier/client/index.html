@@ -15,21 +15,12 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
     crossorigin="anonymous">
 
-<!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
   <!-- Custom styles for this template-->
-  <link href="./app2.css" rel="stylesheet">
-
-  <style>
-    html, body, .container,  #map {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-  </style>
+  <link rel="stylesheet" href="./publilc/css/custom.css">
+  <link rel="stylesheet" href="./publilc/css/index.css">
 </head>
 
 <body id="page-top">
@@ -82,80 +73,7 @@
                         <th>Trạng thái</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <tr>
-                        <td>Tiger Nixon</td>
-                        <td>System Architect</td>
-                        <td>Edinburgh</td>
-                        <td>61</td>
-                        <td>2011/04/25</td>
-                        <td>$320,800</td>
-                      </tr>
-                      <tr>
-                        <td>Tiger Nixon</td>
-                        <td>System Architect</td>
-                        <td>Edinburgh</td>
-                        <td>61</td>
-                        <td>2011/04/25</td>
-                        <td>$320,800</td>
-                      </tr>
-                      <tr>
-                        <td>Tiger Nixon</td>
-                        <td>System Architect</td>
-                        <td>Edinburgh</td>
-                        <td>61</td>
-                        <td>2011/04/25</td>
-                        <td>$320,800</td>
-                      </tr>
-                      <tr>
-                        <td>Tiger Nixon</td>
-                        <td>System Architect</td>
-                        <td>Edinburgh</td>
-                        <td>61</td>
-                        <td>2011/04/25</td>
-                        <td>$320,800</td>
-                      </tr>
-                      <tr>
-                        <td>Tiger Nixon</td>
-                        <td>System Architect</td>
-                        <td>Edinburgh</td>
-                        <td>61</td>
-                        <td>2011/04/25</td>
-                        <td>$320,800</td>
-                      </tr>
-                      <tr>
-                        <td>Tiger Nixon</td>
-                        <td>System Architect</td>
-                        <td>Edinburgh</td>
-                        <td>61</td>
-                        <td>2011/04/25</td>
-                        <td>$320,800</td>
-                      </tr>
-                      <tr>
-                        <td>Tiger Nixon</td>
-                        <td>System Architect</td>
-                        <td>Edinburgh</td>
-                        <td>61</td>
-                        <td>2011/04/25</td>
-                        <td>$320,800</td>
-                      </tr>
-                      <tr>
-                        <td>Tiger Nixon</td>
-                        <td>System Architect</td>
-                        <td>Edinburgh</td>
-                        <td>61</td>
-                        <td>2011/04/25</td>
-                        <td>$320,800</td>
-                      </tr>
-                      <tr>
-                        <td>Tiger Nixon</td>
-                        <td>System Architect</td>
-                        <td>Edinburgh</td>
-                        <td>61</td>
-                        <td>2011/04/25</td>
-                        <td>$320,800</td>
-                      </tr>
-
+                    <tbody id="list">
                     </tbody>
                   </table>
                 </div>
@@ -192,46 +110,54 @@
     crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.12/handlebars.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBYBMYaUEnQ9A42480K33UWa3uuN0dN4E&callback=initMap"
     async defer></script>
 
-  <script>
-    var map, infoWindow, geocoder, marker;
-    var pos = { lat: -34.397, lng: 150.644 };
-    function initMap() {
-      geocoder = new google.maps.Geocoder();
-      map = new google.maps.Map(document.getElementById('map'), {
-        center: pos,
-        zoom: 17
-      });
-      marker = new google.maps.Marker({
-        map: map,
-        draggable: true,
-        animation: google.maps.Animation.DROP,
-        position: pos
-      });
-      marker.addListener('click', toggleBounce);
-      // Try HTML5 geolocation.
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-          var pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          map.setCenter(pos);
-          marker.setPosition(pos);
-        });
-      }
+  <script src="./publilc/js/index.js"></script>
+  <script type="text/javascript">
+    id = 0;
+
+    window.onload = function () {
+      loadRequest();
     }
 
-    function toggleBounce() {
-      if (marker.getAnimation() !== null) {
-        marker.setAnimation(null);
-      } else {
-        marker.setAnimation(google.maps.Animation.DROP);
-      }
+    var loadRequest = function () {
+
+      var instance = axios.create({
+        baseURL: 'http://localhost:3001',
+        timeout: 15000
+      });
+
+      instance.get('/data?id=' + id)
+        .then(function (res) {
+          if (res.status === 200) {
+            id = res.data.max_id;
+            var source = document.getElementById('template').innerHTML;
+            var template = Handlebars.compile(source);
+            var html = template(res.data.requests);
+            document.getElementById('list').innerHTML += html;
+          }
+        }).catch(function (err) {
+          console.log(err);
+        }).then(function () {
+          loadRequest();
+        })
     }
+  </script>
+
+  <script id="template" type="text/x-handlebars-template">
+      {{#each this}}
+      <tr id="{{id}}">
+        <td id="name{{id}}">{{hoten}}</td>
+        <td id="sdt{{id}}">{{sdt}}</td>
+        <td id="addr{{id}}" class="{{id}}"><a class="dinhvi" href="javascript:;" style="color: #00B140;">{{diachi}}</a></td>
+        <td id="note{{id}}">{{ghichu}}</td>
+        <td id="newAddr{{id}}">{{diachimoi}}</td>
+        <td id="status{{id}}">{{trangthai}}</td>
+      </tr>
+      {{/each}}
   </script>
 </body>
 
