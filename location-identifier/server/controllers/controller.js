@@ -3,6 +3,7 @@ var datetime = require('date-and-time');
 var router = express.Router();
 var request = [];
 var pool = require('../db/db').pool;
+var repo = require('../repo/repo')
 
 function realtime() {
     pool.getConnection(function (err, connection) {
@@ -70,9 +71,10 @@ router.post('/update', (req, res) => {
     if (req.body.id) {
         id = +req.body.id;
     }
-    if (request.some(r => r.id === id)) {
-        if (request[id - 1]['trangthai'] === "Chưa định vị") {
-            request[id - 1]['trangthai'] = "Đã định vị";
+    if (request.some(r => r.Id === id)) {
+        if (request[id - 1]['Status'] === "Chưa định vị") {
+            request[id - 1]['Status'] = "Đã định vị";
+            repo.update(request[id - 1]);
         }
         res.statusCode = 200;
         res.json({ "id": id, "status": "ok" });
