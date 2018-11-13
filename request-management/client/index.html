@@ -1,104 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <title>Request Management</title>
+	<head>
+		<meta name="viewport" content="initial-scale=1.0">
+    	<meta charset="utf-8">
+		<title>Request Management</title>
 
-    <meta name="viewport" content="initial-scale=1.0">
-    <meta charset="utf-8">
+		<!-- Bootstrap core CSS-->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	
+		<!-- Font Awesome -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	
+		<!-- Custom styles for this template-->
+		<link rel="stylesheet" href="./publilc/css/custom.css">
+		<link rel="stylesheet" href="./publilc/css/index.css">
+	</head>
+	<body>
+		<nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+			<a class="navbar-brand mr-1" href="/">Request Management</a>
+		</nav>
+		<div id="wrapper">
+			<div id="content-wrapper">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col">
+						<!-- DataTables Example -->
+							<div class="card mb-3">
+								<div class="card-header"><i class="fa fa-table"></i><b> Danh sách requests</b></div>
+								<div class="card-body">
+									<div class="table-responsive" style="max-height: 460px;">
+										<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+											<thead>
+												<tr>
+													<th>Thời gian nhận</th>
+													<th>Họ tên/Số điện thoại</th>
+													<th>Địa chỉ đón khách</th>
+													<th>Ghi chú</th>
+													<th>Thông tin tài tế</th>
+													<th>Trạng thái</th>
+												</tr>
+											</thead>
+											<tbody id="list"></tbody>
+											<script id="template" type="text/x-handlebars-template">
+												{{#each this}}
+												<tr id="{{Id}}">
+													<td id="createdTime{{Id}}">{{CreatedTime}}</td>
+													<td id="name{{Id}}">{{Name}}/{{Phone}}</td>
+													<td id="newAddr{{Id}}" class="{{Id}}"><a class="dinhvi" href="javascript:;" style="color: #00B140;">{{NewAddress}}</a></td>
+													<td id="note{{Id}}">{{Note}}</td>
+													<td id="driver{{Id}}">{{DriverId}}</td>
+													<td id="status{{Id}}">{{Status}}</td>
+												</tr>
+												{{/each}}
+											</script>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col">
+							<!-- Area Chart Example-->
+							<div class="card mb-3">
+								<div class="card-header"><i class="fa fa-chart-area"></i><b>Bản đồ</b></div>
+								<div class="card-body" style="height:500px; ">
+									<div id="map"></div>
+								</div>
+								<!-- <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div> -->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-    <style>
-        body, html {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.12/handlebars.min.js"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBYBMYaUEnQ9A42480K33UWa3uuN0dN4E&callback=initMap" async defer></script>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<script src="./publilc/js/index.js"></script>
+		<script type="text/javascript">
+			var s = '';
 
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
+			window.onload = function() {
+				loadRequests();
+			}
 
-        #map {
-            height: 100%;
-        }
-    </style>
-</head>
-<body>
-    <div style="width: 90%; height: 40%; overflow: auto;">
-        <table>
-            <thead>
-                <tr>
-                <th>Thời gian nhận</th>
-                <th>Họ tên/Số điện thoại</th>
-                <th>Địa chỉ đón khách</th>
-                <th>Ghi chú</th>
-                <th>Tài xế</th>
-                <th>Trạng thái</th>
-                <th>Định vị</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>30th Oct 2018, 10:57</td>
-                    <td>Name<br>Phone</td>
-                    <td>Địa chỉ gốc</td>
-                    <td>...</td>
-                    <td></td>
-                    <td style="color: red"><b>Chưa được định vị</b></td>
-                    <td><button>Định vị</button></td>
-                </tr>
-                <tr>
-                    <td>30th Oct 2018, 10:56</td>
-                    <td>Name<br>Phone</td>
-                    <td>Địa chỉ gốc</td>
-                    <td>...</td>
-                    <td></td>
-                    <td style="color: blue; "><b>Đã định vị xong</b></td>
-                    <td><button>Định vị</button></td>
-                </tr>
-                <tr>
-                    <td>30th Oct 2018, 10:55</td>
-                    <td>Name<br>Phone</td>
-                    <td>Địa chỉ gốc</td>
-                    <td>...</td>
-                    <td>Họ tên:<br>SĐT:<br>Địa chỉ:</td>
-                    <td><b>Đã có xe nhận</b></td>
-                    <td><button>Định vị</button></td>
-                </tr>
-                <tr>
-                    <td>30th Oct 2018, 10:48</td>
-                    <td>Name<br>Phone</td>
-                    <td>Địa chỉ gốc</td>
-                    <td>...</td>
-                    <td>Họ tên:<br>SĐT:<br>Địa chỉ:</td>
-                    <td style="color: yellowgreen"><b>Đang di chuyển</b></td>
-                    <td><button>Định vị</button></td>
-                </tr>
-                <tr>
-                    <td>30th Oct 2018, 10:37</td>
-                    <td>Name<br>Phone</td>
-                    <td>Địa chỉ gốc</td>
-                    <td>...</td>
-                    <td>Họ tên:<br>SĐT:<br>Địa chỉ:</td>
-                    <td style="color: green"><b>Đã hoàn thành</b></td>
-                    <td><button>Định vị</button></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+			var loadRequests = function() {
 
-    <div id="map"></div>
-    <script>
-        var map;
-        function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-            center: {lat: -34.397, lng: 150.644},
-            zoom: 8
-            });
-        }
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBYBMYaUEnQ9A42480K33UWa3uuN0dN4E&callback=initMap"
-    async defer></script>
-</body>
+				var instance = axios.create({
+					baseURL: 'http://localhost:3002/requests/management',
+					timeout: 15000
+				});
+
+				instance.get(s)
+				.then(function(res) {
+					if (res.status === 200) {
+						s = 'receiving';
+						var source = document.getElementById('template').innerHTML;
+						var template = Handlebars.compile(source);
+						var html = template(res.data.requests);
+
+						if (res.data.isAll) {
+							document.getElementById('list').innerHTML = html;
+						}
+						else {
+							if (document.getElementById(`status${res.data.requests[0].Id}`)) {
+								// Đổi trạng thái
+								document.getElementById(`status${res.data.requests[0].Id}`).innerHTML = res.data.requests[0].Status;
+
+								// Thông tin tài xế
+								// document.getElementById(`driver${res.data.requests[0].Id}`).innerHTML = res.data.requests[0].DriverId;
+							} else {
+								// Thêm request
+								document.getElementById('list').innerHTML = html + document.getElementById('list').innerHTML;
+							}
+
+						}
+
+						console.log(document.getElementById('list').innerHTML);
+					}
+				}).catch(function(err) {
+					console.log(err);
+				}).then(function() {
+					loadRequests();
+				})
+			}
+		</script>
+	</body>
 </html>
