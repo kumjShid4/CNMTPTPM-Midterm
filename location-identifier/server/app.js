@@ -1,10 +1,14 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
     morgan = require('morgan'),
-    cors = require('cors');
+    cors = require('cors'),
+    cookieParser = require('cookie-parser');
 var app = express();
 var controller = require('./controllers/controller');
+var userController = require('./controllers/userController');
+var verifyAccessToken = require('./repo/authRepo').verifyAccessToken;
 
+app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({
     extended: true
@@ -17,7 +21,8 @@ app.get('/', (req, res) => {
  });
 
 app.use(express.static(__dirname + "./../client"));
-app.use('/data', controller);
+app.use('/data', verifyAccessToken, controller);
+app.use('/user', userController);
 app.use(cors());
 
 var PORT = process.env.PORT || 3001;

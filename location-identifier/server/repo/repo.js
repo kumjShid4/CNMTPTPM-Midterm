@@ -1,10 +1,5 @@
 var db = require('../db/db');
 
-exports.add = request => {
-    var sql = `insert into requests (Name, Phone, Address, Note) values('${request.Name}', '${request.Phone}', '${request.Address}', '${request.Note}', '${request.Status}')`;
-    return db.save(sql);
-}
-
 exports.single = id => {
     return new Promise((resolve, reject) => {
         var sql = `select * from requests where Id = ${id}`;
@@ -22,6 +17,9 @@ exports.single = id => {
 }
 
 exports.update = request => {
-    var sql=`update requests set Name='${request.Name}', Phone='${request.Phone}', Address='${request.Address}', Note='${request.Note}',Status='${request.Status}' where Id = ${request.Id}`;
-    return db.save(sql);
+    var sql=`update requests set Status='${request.Status}', CurCoordinates='{"lat": "${request.CurCoordinates.lat}", "lng": "${request.CurCoordinates.lng}"}' where Id = ${request.Id}`;
+    if (request.NewCoordinates) {
+        sql=`update requests set Status='${request.Status}', NewCoordinates='{"lat": "${request.NewCoordinates.lat}", "lng": "${request.NewCoordinates.lng}"}', NewAddress= '${request.NewAddress}' where Id = ${request.Id}`;
+    }
+    return db.load(sql);
 }
