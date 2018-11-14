@@ -20,14 +20,12 @@ exports.load = sql => {
                 return;
             }
         });
-
         cn.query(sql, (error, rows, fields) => {
             if (error) {
                 reject(error);
             } else {
                 resolve(rows);
             }
-
             cn.end();
         });
     });
@@ -36,21 +34,18 @@ exports.load = sql => {
 exports.insert = sql => {
     return new Promise((resolve, reject) => {
         var cn = createConnection();
-
         cn.connect((err) => {
             if (err) {
                 console.error('error connecting: ' + err.stack);
                 return;
             }
         });
-
         cn.query(sql, function (error, value) {
             if (error) {
                 reject(error);
             } else {
                 resolve(value);
             }
-
             cn.end();
         });
     });

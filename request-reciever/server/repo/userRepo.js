@@ -2,7 +2,6 @@ var db = require('../db/db');
 
 exports.add = user => {
     var sql = `insert into user(Name, Phone, Email, Username, Password) values('${user.Name}', ${user.Phone}, '${user.Email}', '${user.Username}', '${user.Password}')`;
-    console.log(sql)
     return db.insert(sql);
 }
 

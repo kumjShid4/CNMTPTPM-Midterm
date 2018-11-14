@@ -54,7 +54,7 @@ exports.updateRefreshToken = (userId, rfToken) => {
         db.insert(sql) // delete
             .then(value => {
                 var rdt = moment().format('YYYY-MM-DD HH:mm:ss');
-                sql = `insert into refreshtoken values(${userId}, 1, '${rfToken}', '${rdt}')`;
+                sql = `insert into refreshtoken(userId, userType, rftoken, rtd) values(${userId}, 1, '${rfToken}', '${rdt}')`;
                 return db.insert(sql);
             })
             .then(value => resolve(value))
