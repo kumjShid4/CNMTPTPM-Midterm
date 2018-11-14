@@ -1,59 +1,57 @@
 var mysql = require('mysql');
 
+//connection
+var createConnection = () => {
+    return mysql.createConnection({
+        host: '35.197.150.36',
+        port: 3306,
+        user: 'root',
+        password: 'dbrealtime',
+        database: 'dbrealtime'
+    });
+}
+
 exports.load = sql => {
     return new Promise((resolve, reject) => {
-        var connection = mysql.createConnection({
-            host: '35.197.150.36',
-            port: 3306,
-            user: 'root',
-            password: 'dbrealtime',
-            database: 'dbrealtime'
-        });
-
-        connection.connect((err) => {
+        var cn = createConnection();
+        cn.connect((err) => {
             if (err) {
                 console.error('error connecting: ');
                 return;
             }
         });
 
-        connection.query(sql, (error, rows, fields) => {
+        cn.query(sql, (error, rows, fields) => {
             if (error) {
                 reject(error);
             } else {
                 resolve(rows);
             }
 
-            connection.end();
+            cn.end();
         });
     });
 }
 
-exports.save = sql => {
+exports.insert = sql => {
     return new Promise((resolve, reject) => {
-        var connection = mysql.createConnection({
-            host: '35.197.150.36',
-            port: 3306,
-            user: 'root',
-            password: 'dbrealtime',
-            database: 'dbrealtime'
-        });
+        var cn = createConnection();
 
-        connection.connect((err) => {
+        cn.connect((err) => {
             if (err) {
                 console.error('error connecting: ' + err.stack);
                 return;
             }
         });
 
-        connection.query(sql, function (error, value) {
+        cn.query(sql, function (error, value) {
             if (error) {
                 reject(error);
             } else {
                 resolve(value);
             }
 
-            connection.end();
+            cn.end();
         });
     });
 }

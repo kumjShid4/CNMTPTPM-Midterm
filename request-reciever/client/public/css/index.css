@@ -38,8 +38,3 @@ img {
     height: auto;
     position: absolute;
 }
-
-.form-control {
-    border-radius: 1rem;
-    width: 75%;
-}

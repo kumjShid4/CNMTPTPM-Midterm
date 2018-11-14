@@ -2,7 +2,7 @@ var db = require('../db/db');
 
 exports.add = request => {
     var sql = `insert into requests (Name, Phone, Address, Note, Status) values('${request.Name}', '${request.Phone}', '${request.Address}', '${request.Note}', '${request.Status}')`;
-    return db.save(sql);
+    return db.insert(sql);
 }
 
 exports.single = id => {
@@ -23,5 +23,5 @@ exports.single = id => {
 
 exports.update = request => {
     var sql=`update requests set Name='${request.Name}', Phone='${request.Phone}', Address='${request.Address}', Note='${request.Note}',Status='${request.Status}' where Id = ${request.Id}`;
-    return db.save(sql);
+    return db.insert(sql);
 }
