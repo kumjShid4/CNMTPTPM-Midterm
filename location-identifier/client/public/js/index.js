@@ -1,7 +1,7 @@
 var id = 0;
 var loadRequest = function () {
     //chỉ load request khi đã đăng nhập
-    if (Cookies.get('auth') == "true") {
+    if (Cookies.get('identifier_auth') == "true") {
         var instance = axios.create({
             baseURL: 'http://localhost:3001',
             timeout: 15000
@@ -29,10 +29,10 @@ var loadRequest = function () {
 
 $(document).ready(function () {
     //check login
-    if (Cookies.get('auth') == "true") {
+    if (Cookies.get('identifier_auth') == "true") {
         loadRequest();
         //thêm tên user
-        $("#userDropdown").append(Cookies.get('name'));
+        $("#userDropdown").append(Cookies.get('identifier_name'));
         //hidden login, signup dropdown item
         //show logout
         setDropDownItem(true);
@@ -92,7 +92,7 @@ $("#loginBtn").click(function (e) {
             alert("Thành công");
             setDropDownItem(true);
             //thêm tên user
-            $("#userDropdown").append(Cookies.get('name'));
+            $("#userDropdown").append(Cookies.get('identifier_name'));
             $("#loginModal").modal('hide');
             loadRequest();
         },
@@ -133,9 +133,9 @@ $("#signupBtn").click(function (e) {
 //logout
 $("#logoutDropdown").click(function () {
     //remove token, name user trong cookie
-    Cookies.remove('token');
-    Cookies.remove('name');
-    Cookies.set('auth', false);
+    Cookies.remove('identifier_token');
+    Cookies.remove('identifier_name');
+    Cookies.set('identifier_auth', false);
     $("#userDropdown").text("");
     $("#userDropdown").append('\<i class="fa fa-user-circle fa-fw"></i>')
     setDropDownItem(false);

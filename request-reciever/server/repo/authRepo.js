@@ -21,7 +21,7 @@ exports.generateAccessToken = userEntity => {
 }
 
 exports.verifyAccessToken = (req, res, next) => {
-    var token = req.cookies.token;
+    var token = req.cookies.user_token;
     if (token) {
         jwt.verify(token, SECRET, (err, payload) => {
             if (err) {

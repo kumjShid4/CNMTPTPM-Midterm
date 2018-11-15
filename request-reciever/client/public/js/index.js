@@ -25,9 +25,9 @@ $(document).ready(function () {
     //event key up request form
     $('.request').keyup(doCheck);
     //check login
-    if (Cookies.get('auth') == "true") {
+    if (Cookies.get('user_auth') == "true") {
         //thêm tên user
-        $("#userDropdown").append(Cookies.get('name'));
+        $("#userDropdown").append(Cookies.get('user_name'));
         //hidden login, signup dropdown item
         //show logout
         setDropDownItem(true);
@@ -115,7 +115,7 @@ $("#loginBtn").click(function (e) {
             alert("Thành công");
             setDropDownItem(true);
             //thêm tên user
-            $("#userDropdown").append(Cookies.get('name'));
+            $("#userDropdown").append(Cookies.get('user_name'));
             $("#loginModal").modal('hide');
         },
         error: (err) => {
@@ -155,9 +155,9 @@ $("#signupBtn").click(function (e) {
 //logout
 $("#logoutDropdown").click(function () {
     //remove token, name user trong cookie
-    Cookies.remove('token');
-    Cookies.remove('name');
-    Cookies.set('auth', false);
+    Cookies.remove('user_token');
+    Cookies.remove('user_name');
+    Cookies.set('user_auth', false);
     $("#userDropdown").text("");
     $("#userDropdown").append('\<i class="fa fa-user-circle fa-fw"></i>')
     setDropDownItem(false);

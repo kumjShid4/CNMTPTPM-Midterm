@@ -35,9 +35,9 @@ router.post('/login', (req, res) => {
             authRepo.updateRefreshToken(userEntity.Id, rfToken)
                 .then(value => {
                     //set token, name, auth vào cookie
-                    res.cookie('token', acToken);
-                    res.cookie('name', userEntity.Name);
-                    res.cookie('auth', true);
+                    res.cookie('identifier_token', acToken);
+                    res.cookie('identifier_name', userEntity.Name);
+                    res.cookie('identifier_auth', true);
                     res.json({
                         auth: true,
                         user: userEntity,
@@ -49,18 +49,18 @@ router.post('/login', (req, res) => {
                     console.log(err);
                     //remove token, name trong cookie
                     //set auth = false
-                    res.cookie('token', '', {expires: new Date(0)});
-                    res.cookie('name', '', {expires: new Date(0)});
-                    res.cookie('auth', false);
+                    res.cookie('identifier_token', '', {expires: new Date(0)});
+                    res.cookie('identifier_name', '', {expires: new Date(0)});
+                    res.cookie('identifier_auth', false);
                     res.statusCode = 500;
                     res.end('View error log on console');
                 })
         } else {
             //remove token, name trong cookie
             //set auth = false
-            res.cookie('token', '', {expires: new Date(0)});
-            res.cookie('name', '', {expires: new Date(0)});
-            res.cookie('auth', false);
+            res.cookie('identifier_token', '', {expires: new Date(0)});
+            res.cookie('identifier_name', '', {expires: new Date(0)});
+            res.cookie('identifier_auth', false);
             res.statusCode = 401;
             res.json({
                 auth: false
