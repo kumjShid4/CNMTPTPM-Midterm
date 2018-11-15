@@ -10,7 +10,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.5",
+    "crypto-js": "^3.1.9-1",
     "express": "^4.16.4",
-    "morgan": "^1.9.1"
+    "i": "^0.3.6",
+    "jsonwebtoken": "^8.3.0",
+    "moment": "^2.22.2",
+    "morgan": "^1.9.1",
+    "mysql": "^2.16.0",
+    "rand-token": "^0.4.0"
   }
 }
