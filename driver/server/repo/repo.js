@@ -21,7 +21,3 @@ exports.single = id => {
     });
 }
 
-exports.update = request => {
-    var sql=`update requests set Name='${request.Name}', Phone='${request.Phone}', Address='${request.Address}', Note='${request.Note}',Status='${request.Status}' where Id = ${request.Id}`;
-    return db.insert(sql);
-}

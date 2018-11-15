@@ -56,11 +56,11 @@
                      <div class="card-header">
                         <i class="fa fa-motorcycle"></i>
                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                           <label class="btn btn-outline-success btn-sm active">
+                           <label class="btn btn-outline-success btn-sm " id="ready">
                               <input type="radio" name="options" id="option1" autocomplete="off" checked>
                               Ready
                            </label>
-                           <label class="btn btn-outline-warning btn-sm">
+                           <label class="btn btn-outline-warning btn-sm "id="standby">
                               <input type="radio" name="options" id="option2" autocomplete="off"> Stand by
                            </label>
                         </div>
@@ -219,44 +219,6 @@
    <script src="./public/js/index.js"></script>
    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
 
-   <script>
-      var map, infoWindow, geocoder, marker;
-      var pos = { lat: -34.397, lng: 150.644 };
-      function initMap() {
-         geocoder = new google.maps.Geocoder();
-         map = new google.maps.Map(document.getElementById('map'), {
-            center: pos,
-            zoom: 17
-         });
-         marker = new google.maps.Marker({
-            map: map,
-            draggable: true,
-            animation: google.maps.Animation.DROP,
-            position: pos
-         });
-         marker.addListener('click', toggleBounce);
-         // Try HTML5 geolocation.
-         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-               var pos = {
-                  lat: position.coords.latitude,
-                  lng: position.coords.longitude
-               };
-               map.setCenter(pos);
-               marker.setPosition(pos);
-            });
-         }
-      }
-
-      function toggleBounce() {
-         if (marker.getAnimation() !== null) {
-            marker.setAnimation(null);
-         } else {
-            marker.setAnimation(google.maps.Animation.DROP);
-         }
-      }
-
-   </script>
 </body>
 
 </html>

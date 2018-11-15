@@ -27,7 +27,6 @@ router.post('/login', (req, res) => {
         Username: req.body.Username,
         Password: MD5(req.body.Password).toString()
     };
-    console.log(user.Password);
     userRepo.login(user).then(rows => {
         if (rows.length > 0) {
             var userEntity = rows[0];
@@ -36,10 +35,9 @@ router.post('/login', (req, res) => {
 			
             authRepo.updateRefreshToken(userEntity.Id, rfToken)
                 .then(value => {
-                    
                     res.cookie('driver_token', acToken);
-                    res.cookie('driver_name', userEntity.Name);
                     res.cookie('driver_auth', true);
+                    res.cookie('driver', userEntity);
                     res.json({
                         auth: true,
                         user: userEntity,
@@ -50,15 +48,15 @@ router.post('/login', (req, res) => {
                 .catch(err => {
                     console.log(err);
                     res.cookie('driver_token', '', {expires: new Date(0)});
-                    res.cookie('driver_name', '', {expires: new Date(0)});
                     res.cookie('driver_auth', false);
+                    res.cookie('driver', '', {expires: new Date(0)});
                     res.statusCode = 500;
                     res.end('View error log on console');
                 })
         } else {
             res.cookie('driver_token', '', {expires: new Date(0)});
-            res.cookie('driver_name', '', {expires: new Date(0)});
             res.cookie('driver_auth', false);
+            res.cookie('driver', '', {expires: new Date(0)});
             res.statusCode = 401;
             res.json({
                 auth: false

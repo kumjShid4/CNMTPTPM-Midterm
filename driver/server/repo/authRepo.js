@@ -5,7 +5,7 @@ var moment = require('moment');
 var db=require('../db/db');
 
 const SECRECT = 'QWERTY_WANNASMILE';
-const AC_LIFETIME = 300;
+const AC_LIFETIME = 600;
 
 exports.generateAccessToken = userEntity=> {
     var payload= {
@@ -32,7 +32,7 @@ exports.verifyAccessToken = (req, res,next) => {
                     errer:err
                 })
             } else {
-                req.token.payload = payload;
+                req.token_payload = payload;
                 next();
             }
         });

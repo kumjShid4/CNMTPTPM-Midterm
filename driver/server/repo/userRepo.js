@@ -8,13 +8,13 @@ exports.add = userEntity => {
 }
 
 exports.login = userEntity => {
-    var sql = `select * from user where Username = '${userEntity.Username}' and Password = '${userEntity.Password}'`; 
+    var sql = `select * from driver where Username = '${userEntity.Username}' and Password = '${userEntity.Password}'`; 
     return db.load(sql);
 }
 
 exports.single = Id => {
     return new Promise((resolve, reject) => {
-        var sql = `select * from user where Id = ${Id}`;
+        var sql = `select * from driver where Id = ${Id}`;
         db.load(sql).then(rows => {
             if (rows.length === 0) {
                 resolve(null);
@@ -29,6 +29,10 @@ exports.single = Id => {
 }
 
 exports.update = userEntity => {
-    var sql = `update user set Password='${userEntity.Password}', Name='${userEntity.Name}', Email='${userEntity.Email}', Phone='${userEntity.Phone}',License='${userEntity.License}' where Id = ${userEntity.Id}`;
-    return db.insert(sql);
+    var sql = `update driver set Status='${userEntity.Status}', Password='${userEntity.Password}', Name='${userEntity.Name}', Email='${userEntity.Email}', Phone='${userEntity.Phone}',License='${userEntity.License}' where Id = ${userEntity.Id}`;
+    if (userEntity.Coordinates) {
+     sql = `update driver set Status='${userEntity.Status}', Password='${userEntity.Password}', Name='${userEntity.Name}', Email='${userEntity.Email}', Phone='${userEntity.Phone}',License='${userEntity.License}',Coordinates='{"lat": "${userEntity.Coordinates.lat}","lng":"${userEntity.Coordinates.lng}"}'  where Id = ${userEntity.Id}`;
+    } 
+    return db.load(sql);
 }
+

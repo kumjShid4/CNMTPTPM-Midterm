@@ -26,7 +26,7 @@ app.use(express.static(__dirname + "./../client"));
 app.use('/data', verifyAccessToken, controller);
 app.use('/user', userController);
 
-var PORT = process.env.PORT || 3002;
+var PORT = process.env.PORT || 3003;
 app.listen(PORT, () => {
     console.log(`API running on PORT ${PORT}`);
 }); 
