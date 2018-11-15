@@ -20,7 +20,7 @@ exports.generateAccessToken = userEntity=> {
 }
 
 exports.verifyAccessToken = (req, res,next) => {
-    var token = req.headers['x-access-token'];
+    var token = req.cookies.driver_token;
     console.log(token);
     if (token) {
         jwt.verify(token, SECRECT, (err,payload )=> {
