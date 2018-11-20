@@ -12,12 +12,23 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 	
 		<!-- Custom styles for this template-->
-		<link rel="stylesheet" href="./publilc/css/custom.css">
 		<link rel="stylesheet" href="./publilc/css/index.css">
 	</head>
-	<body>
+	<body id="page-top">
 		<nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 			<a class="navbar-brand mr-1" href="/">Request Management</a>
+			<ul class="navbar-nav ml-auto mr-0">
+				<li class="nav-item dropdown no-arrow">
+					<a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<i class="fa fa-user-circle fa-fw"></i>
+					</a>
+					<div class="dropdown-menu dropdown-menu-right" id="dropdownItem" aria-labelledby="userDropdown">
+						<a class="dropdown-item" id="loginDropdown" href="#" data-toggle="modal" data-target="#loginModal">Login</a>
+						<a class="dropdown-item" id="signupDropdown" href="#" data-toggle="modal" data-target="#signupModal">Sign up</a>
+						<a class="dropdown-item" id="logoutDropdown" href="#">Logout</a>
+					</div>
+				</li>
+			</ul>
 		</nav>
 		<div id="wrapper">
 			<div id="content-wrapper">
@@ -33,7 +44,7 @@
 											<thead>
 												<tr>
 													<th>Thời gian nhận</th>
-													<th>Họ tên/Số điện thoại</th>
+													<th>Họ tên<br>Số điện thoại</th>
 													<th>Địa chỉ đón khách</th>
 													<th>Ghi chú</th>
 													<th>Thông tin tài tế</th>
@@ -45,10 +56,10 @@
 												{{#each this}}
 												<tr id="{{Id}}">
 													<td id="createdTime{{Id}}">{{CreatedTime}}</td>
-													<td id="name{{Id}}">{{Name}}/{{Phone}}</td>
+													<td id="name{{Id}}">{{Name}}<br>{{Phone}}</td>
 													<td id="newAddr{{Id}}" class="{{Id}}"><a class="dinhvi" href="javascript:;" style="color: #00B140;">{{NewAddress}}</a></td>
 													<td id="note{{Id}}">{{Note}}</td>
-													<td id="driver{{Id}}">{{DriverId}}</td>
+													<td id="driver{{Id}}">{{DriverId.Name}}<br>{{DriverId.Phone}}<br>{{DriverId.Email}}<br>{{DriverId.Status}}</td>
 													<td id="status{{Id}}">{{Status}}</td>
 												</tr>
 												{{/each}}
@@ -70,6 +81,92 @@
 						</div>
 					</div>
 				</div>
+				<!-- Modal Login -->
+				<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="loginModalLabel">Login</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<form id="loginForm">
+								<div class="form-group">
+									<div class="form-label-group">
+									<label for="loginUsername">Username</label>
+									<input type="text" id="loginUsername" name="Username" class="form-control login" placeholder="Username"
+										required="required" autofocus="autofocus">
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="form-label-group">
+									<label for="loginPassword">Password</label>
+									<input type="password" id="loginPassword" name="Password" class="form-control login" placeholder="Password"
+										required="required">
+									</div>
+								</div>
+								<button disabled id="loginBtn" type="submit" class="btn btn-lg btn-block btn-outline-success">Login</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Modal Signup -->
+				<div class="modal fade" id="signupModal" tabindex="-1" role="dialog" aria-labelledby="signupModalLabel" aria-hidden="true">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="loginModalLabel">Sign up</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<form id=signupForm>
+									<div class="form-group">
+										<div class="form-label-group">
+											<label for="username">Username</label>
+											<input type="text" id="username" name="Username" maxlength="20" class="form-control" placeholder="Username" required="required" autofocus="autofocus">
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="form-label-group">
+											<label for="name">Name</label>
+											<input type="text" id="name" maxlength="30" name="Name" class="form-control signup" placeholder="Name" required="required">
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="form-label-group">
+										<label for="phone">Phone</label>
+										<input type="text" id="phone" maxlength="10" name="Phone" class="form-control signup" placeholder="Phone" required="required">
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="form-label-group">
+										<label for="email">Email</label>
+										<input type="email" id="email" maxlength="30" name="Email" class="form-control signup" placeholder="Email" required="required">
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="form-label-group">
+										<label for="signupPassword">Password</label>
+										<input type="password" id="signupPassword" name="Password" class="form-control signup" placeholder="Password" required="required">
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="form-label-group">
+										<label for="confirmPassword">Confirm Password</label>
+										<input type="password" id="confirmPassword" name="confirmPassword" class="form-control signup" placeholder="Confirm Password" required="required">
+										</div>
+									</div>
+									<button id="signupBtn" type="submit" class="btn btn-lg btn-block btn-outline-primary">Sign up</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -79,54 +176,7 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.12/handlebars.min.js"></script>
 		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBYBMYaUEnQ9A42480K33UWa3uuN0dN4E&callback=initMap" async defer></script>
 		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
 		<script src="./publilc/js/index.js"></script>
-		<script type="text/javascript">
-			var s = '';
-
-			window.onload = function() {
-				loadRequests();
-			}
-
-			var loadRequests = function() {
-
-				var instance = axios.create({
-					baseURL: 'http://localhost:3002/requests/management',
-					timeout: 15000
-				});
-
-				instance.get(s)
-				.then(function(res) {
-					if (res.status === 200) {
-						s = 'receiving';
-						var source = document.getElementById('template').innerHTML;
-						var template = Handlebars.compile(source);
-						var html = template(res.data.requests);
-
-						if (res.data.isAll) {
-							document.getElementById('list').innerHTML = html;
-						}
-						else {
-							if (document.getElementById(`status${res.data.requests[0].Id}`)) {
-								// Đổi trạng thái
-								document.getElementById(`status${res.data.requests[0].Id}`).innerHTML = res.data.requests[0].Status;
-
-								// Thông tin tài xế
-								// document.getElementById(`driver${res.data.requests[0].Id}`).innerHTML = res.data.requests[0].DriverId;
-							} else {
-								// Thêm request
-								document.getElementById('list').innerHTML = html + document.getElementById('list').innerHTML;
-							}
-
-						}
-
-						console.log(document.getElementById('list').innerHTML);
-					}
-				}).catch(function(err) {
-					console.log(err);
-				}).then(function() {
-					loadRequests();
-				})
-			}
-		</script>
 	</body>
 </html>

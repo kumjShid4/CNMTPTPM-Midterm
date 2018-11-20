@@ -123,3 +123,184 @@ function markerCoords(markerobject) {
         console.log("marker is being dragged");
     });
 }
+
+var s = '';
+var loadRequest = function () {
+    // Chỉ load request khi đã đăng nhập
+    if (Cookies.get('identifier_auth') == "true") {
+        var instance = axios.create({
+            baseURL: 'http://localhost:3002/data',
+            timeout: 15000
+        });
+
+        instance.get(s)
+        .then(function(res) {
+            if (res.status === 200) {
+                s = 'receiving';
+                var source = document.getElementById('template').innerHTML;
+                var template = Handlebars.compile(source);
+                var html = template(res.data.requests);
+
+                console.log(res.data.requests);
+
+                if (res.data.isAll) {
+                    document.getElementById('list').innerHTML = html;
+                }
+                else {
+                    if (document.getElementById(`status${res.data.requests[0].Id}`)) {
+                        // Đổi trạng thái
+                        document.getElementById(`status${res.data.requests[0].Id}`).innerHTML = res.data.requests[0].Status;
+
+                        // Thông tin tài xế
+                        if (res.data.requests[0].DriverId != null) {
+                            document.getElementById(`driver${res.data.requests[0].Id}`).innerHTML = res.data.requests[0].DriverId.Name + "<br>" + 
+                                                                                                    res.data.requests[0].DriverId.Phone + "<br>" + 
+                                                                                                    res.data.requests[0].DriverId.Email + "<br>" + 
+                                                                                                    res.data.requests[0].DriverId.Status;
+                        } else {
+                            document.getElementById(`driver${res.data.requests[0].Id}`).innerHTML = '';
+                        }
+                    } else {
+                        // Thêm request
+                        document.getElementById('list').innerHTML = html + document.getElementById('list').innerHTML;
+                    }
+                }
+            }
+        }).catch(function(err) {
+            console.log(err);
+        }).then(function() {
+            loadRequest();
+        })
+    }
+}
+
+$(document).ready(function () {
+    //check login
+    if (Cookies.get('identifier_auth') == "true") {
+        loadRequest();
+        //thêm tên user
+        $("#userDropdown").append(Cookies.get('identifier_name'));
+        //hidden login, signup dropdown item
+        //show logout
+        setDropDownItem(true);
+    } else {
+        //show login, signup dropdown item
+        //hidden logout
+        setDropDownItem(false);
+    }
+})
+
+//Kiểm tra các input của form login
+//Nếu có một input rỗng, disable button login
+//ngược lại enable
+$("#loginForm").keyup(function () {
+    var allFilled = true;
+    $('.login').each(function () {
+        if ($(this).val() == '') {
+            allFilled = false;
+        }
+    });
+
+    $('#loginBtn').prop('disabled', !allFilled);
+    if (allFilled) {
+        $('#loginBtn').removeAttr('disabled');
+    }
+})
+
+//Kiểm tra các input của form signup
+//Nếu có một input rỗng, disable button signup
+//ngược lại enable
+$("#signupForm").keyup(function () {
+    var allFilled = true;
+    $('.signup').each(function () {
+        if ($(this).val() == '') {
+            allFilled = false;
+        }
+    });
+
+    $('#signupBtn').prop('disabled', !allFilled);
+    if (allFilled) {
+        $('#signupBtn').removeAttr('disabled');
+    }
+})
+
+// event login button click
+$("#loginBtn").click(function (e) {
+    // cancel submit form
+    e.preventDefault();
+    // get data
+    var data = $("#loginForm").serialize();
+    // ajax
+    $.ajax({
+        method: 'POST',
+        url: '/user/login',
+        data: data,
+        success: (res) => {
+            alert("Thành công");
+            setDropDownItem(true);
+            //thêm tên user
+            $("#userDropdown").append(Cookies.get('identifier_name'));
+            $("#loginModal").modal('hide');
+            loadRequest();
+        },
+        error: (err) => {
+            alert("Đăng nhập không thành công, vui lòng thử lại");
+            console.log(err);
+        }
+    })
+});
+
+//event signup button click
+$("#signupBtn").click(function (e) {
+    //cancel submit form
+    e.preventDefault();
+    //get data
+    var data = $("#signupForm").serialize();
+    //check confirm password
+    if ($("#signupPassword").val() == $("#confirmPassword").val()) {
+        //ajax
+        $.ajax({
+            method: 'POST',
+            url: '/user/register',
+            data: data,
+            success: (res) => {
+                alert("Thành công");
+                $("#signupModal").modal('hide');
+            },
+            error: (err) => {
+                alert("Đăng kí không thành công, vui lòng thử lại");
+                console.log(err);
+            }
+        })
+    } else {
+        alert("Mật khẩu xác nhận không đúng");
+    }
+});
+
+//logout
+$("#logoutDropdown").click(function () {
+    //remove token, name user trong cookie
+    Cookies.remove('identifier_token');
+    Cookies.remove('identifier_name');
+    Cookies.set('identifier_auth', false);
+    $("#userDropdown").text("");
+    $("#userDropdown").append('\<i class="fa fa-user-circle fa-fw"></i>')
+    setDropDownItem(false);
+    //clear table data
+    $("#dataTable tbody").empty();
+    //set s request = ''
+    s = '';
+});
+
+//set trạng thái cho các dropdown item
+function setDropDownItem(isAuth) {
+    if (isAuth) {
+        $("#loginDropdown").attr("hidden", true);
+        $("#signupDropdown").attr("hidden", true);
+        $("#logoutDropdown").attr("hidden", false);
+    } else {
+        $("#loginDropdown").attr("hidden", false);
+        $("#signupDropdown").attr("hidden", false);
+        $("#logoutDropdown").attr("hidden", true);
+    }
+}

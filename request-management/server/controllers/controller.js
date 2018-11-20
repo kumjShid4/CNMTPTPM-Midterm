@@ -1,17 +1,18 @@
 var express = require('express'),
-    repo = require('../repos/repo'),
+    repo = require('../repo/repo'),
+    userRepo = require('../repo/userRepo'),
     datetime = require('date-and-time');
 
 var router = express.Router();
 
 var requestReceived = [];
 
-// Lấy dữ liệu
+// Get requests
 router.get('/', (req, res) => {
     repo.loadAllDecTime()
         .then(rows => {
             for (var i = 0; i < rows.length; i++) {
-                rows[i].CreatedTime = datetime.format(new Date(), 'DD-MM-YYYY HH:mm:ss');
+                rows[i].CreatedTime = datetime.format(new Date(rows[i].CreatedTime), 'DD-MM-YYYY HH:mm:ss');
             }
             
             res.json({
@@ -33,9 +34,20 @@ router.get('/receiving', (req, res) => {
             var request = requestReceived;
             requestReceived = [];
 
-            res.json({
-                requests: request,
-                isAll: false
+            userRepo.loadDriverID(request[0].DriverId)
+            .then(row => {
+                request[0].DriverId = row[0];
+                res.json({
+                    requests: request,
+                    isAll: false
+                })
+            }).catch(err => {
+                console.log(err);
+                request[0].DriverId = null;
+                res.json({
+                    requests: request,
+                    isAll: false
+                })
             })
         } else {
             loop++;
@@ -55,7 +67,6 @@ router.get('/receiving', (req, res) => {
 // Nhận 1 request
 router.post('/', (req, res) => {
     requestReceived = req.body;
-    console.log(requestReceived);
     res.redirect('/');
 })
 
