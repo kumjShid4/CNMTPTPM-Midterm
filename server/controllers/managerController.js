@@ -9,21 +9,29 @@ var requestReceived = [];
 
 // Get requests
 router.get('/', (req, res) => {
-    repo.loadAllDecTime()
-        .then(rows => {
-            for (var i = 0; i < rows.length; i++) {
-                rows[i].CreatedTime = datetime.format(new Date(rows[i].CreatedTime), 'DD-MM-YYYY HH:mm:ss');
+    var requests = repo.loadAllDecTime();
+    var driver = repo.loadAllDriver();
+    Promise.all([requests, driver]).then(([rowReq, rowDriver]) => {
+        for (var i = 0; i < rowReq.length; i++) {
+            rowReq[i].CreatedTime = datetime.format(new Date(rowReq[i].CreatedTime), 'DD-MM-YYYY HH:mm:ss');
+            if (rowReq[i].Status === 'Đã nhận xe') {
+                for (var j = 0;j < rowDriver.length; j++) {
+                    if (rowDriver[j].Id === rowReq[i].DriverId) {
+                        rowReq[i].Driver = rowDriver[j];
+                        break;
+                    }
+                }
             }
-            
-            res.json({
-                requests: rows,
-                isAll: true
-            });
-        }).catch(err => {
-            console.log(err);
-            res.statusCode = 500;
-            res.end('View error log on console');
-        })
+        }
+        res.json({
+            requests: rowReq,
+            isAll: true
+        });
+    }).catch(err => {
+        console.log(err);
+        res.statusCode = 500;
+        res.end('View error log on console');
+    })
 })
 
 // Xử lý request
@@ -69,5 +77,7 @@ router.post('/', (req, res) => {
     requestReceived = req.body;
     res.redirect('/');
 })
+
+
 
 module.exports = router;

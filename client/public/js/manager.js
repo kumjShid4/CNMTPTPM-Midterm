@@ -1,7 +1,7 @@
 //Định vị địa chỉ gốc của người dùng
 $(document).on("click", ".dinhvi", function () {
     var id = $(this).parent().attr('class'); //id request 
-    var newAddr = $("#newAddr" + id).text(); //địa chỉ mới
+    var status= $("#status"+id).text();
     //set normat text cho tất cả các dòng
     $('tr').css({
         "color": "#000", 
@@ -15,28 +15,20 @@ $(document).on("click", ".dinhvi", function () {
     //kiểm tra địa chỉ mới đã cập nhật chưa
     //nếu chưa cập nhật địa chỉ mới thì định vị địa chỉ cũ
     //ngược lại định vị địa chỉ mới
-    if (newAddr == "") {
-        $.ajax({
-            method: 'POST',
-            url: '/manager/update',
-            dataType: 'json',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "id": id,
-            }),
-            success: (res) => {
-                $("#status" + id).text("Đã định vị");
-                //định vị địa chỉ gốc trên map
-                codeAddress($("#addr" + id).children().text());
-            },
-            error: (err) => {
-                console.log(err);
-            }
-        })
-    }
-    else {
-        //định vị địa chỉ mới trên map
+    if (status==='Đã nhận xe'){
+        var tempstartcoor=$("#startcoor"+id).val();
+        var startcoor=JSON.parse(tempstartcoor);
+        var tempendcoor=$("#endcoor"+id).val();
+        var endcoor=JSON.parse(tempendcoor);
+        var directionsDisplay = new google.maps.DirectionsRenderer();
+        var directionsService = new google.maps.DirectionsService();
+        directionsDisplay.setMap(map);
+         calcRoute(directionsService,directionsDisplay,startcoor,endcoor);
+        console.log(startcoor);
+    } else { 
+        directionsDisplay.setMap(null);
         codeAddress(newAddr);
+
     }
 })
 
@@ -142,29 +134,7 @@ var loadRequest = function () {
                 var html = template(res.data.requests);
 
                 console.log(res.data.requests);
-
-                if (res.data.isAll) {
-                    document.getElementById('list').innerHTML = html;
-                }
-                else {
-                    if (document.getElementById(`status${res.data.requests[0].Id}`)) {
-                        // Đổi trạng thái
-                        document.getElementById(`status${res.data.requests[0].Id}`).innerHTML = res.data.requests[0].Status;
-
-                        // Thông tin tài xế
-                        if (res.data.requests[0].DriverId != null) {
-                            document.getElementById(`driver${res.data.requests[0].Id}`).innerHTML = res.data.requests[0].DriverId.Name + "<br>" + 
-                                                                                                    res.data.requests[0].DriverId.Phone + "<br>" + 
-                                                                                                    res.data.requests[0].DriverId.Email + "<br>" + 
-                                                                                                    res.data.requests[0].DriverId.Status;
-                        } else {
-                            document.getElementById(`driver${res.data.requests[0].Id}`).innerHTML = '';
-                        }
-                    } else {
-                        // Thêm request
-                        document.getElementById('list').innerHTML = html + document.getElementById('list').innerHTML;
-                    }
-                }
+                document.getElementById('list').innerHTML = html;
             }
         }).catch(function(err) {
             console.log(err);
@@ -176,6 +146,7 @@ var loadRequest = function () {
 
 $(document).ready(function () {
     //check login
+   
     if (Cookies.get('manager_auth') == "true") {
         loadRequest();
         //thêm tên user
@@ -236,6 +207,7 @@ $("#loginBtn").click(function (e) {
         method: 'POST',
         url: '/user/login',
         data: data,
+        
         success: (res) => {
             alert("Thành công");
             setDropDownItem(true);
@@ -244,6 +216,11 @@ $("#loginBtn").click(function (e) {
             $("#userDropdown").append(user["Name"]);
             $("#loginModal").modal('hide');
             loadRequest();
+            setTimeout(function(){location.reload(); 
+                                    alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
+                                     logout();},600000);
+           
+         
         },
         error: (err) => {
             alert("Đăng nhập không thành công, vui lòng thử lại");
@@ -282,19 +259,24 @@ $("#signupBtn").click(function (e) {
     }
 });
 
+
 //logout
+
+function logout() {
+      //remove token, name user trong cookie
+      Cookies.remove('manager_token');
+      Cookies.remove('manager');
+      Cookies.set('manager_auth', false);
+      $("#userDropdown").text("");
+      $("#userDropdown").append('\<i class="fa fa-user-circle fa-fw"></i>')
+      setDropDownItem(false);
+      //clear table data
+      $("#dataTable tbody").empty();
+      //set s request = ''
+      s = '';
+}
 $("#logoutDropdown").click(function () {
-    //remove token, name user trong cookie
-    Cookies.remove('manager_token');
-    Cookies.remove('manager');
-    Cookies.set('manager_auth', false);
-    $("#userDropdown").text("");
-    $("#userDropdown").append('\<i class="fa fa-user-circle fa-fw"></i>')
-    setDropDownItem(false);
-    //clear table data
-    $("#dataTable tbody").empty();
-    //set s request = ''
-    s = '';
+   logout();
 });
 
 //set trạng thái cho các dropdown item
@@ -309,3 +291,23 @@ function setDropDownItem(isAuth) {
         $("#logoutDropdown").attr("hidden", true);
     }
 }
+
+// tìm đường đi
+function calcRoute(directionsService,directionsDisplay,startcoor,endcoor) {
+    var start = new google.maps.LatLng(startcoor.lat, startcoor.lng);
+    var end = new google.maps.LatLng(endcoor.lat, endcoor.lng);
+    var bounds = new google.maps.LatLngBounds();
+    var request = {
+        origin: start,
+        destination: end,
+        travelMode: 'DRIVING'
+    };
+    directionsService.route(request, function (response, status) {
+        if (status === 'OK') {
+            directionsDisplay.setDirections(response);
+            directionsDisplay.setMap(map);
+        } else {
+            alert("Directions Request from " + start.toUrlValue(6) + " to " + end.toUrlValue(6) + " failed: " + status);
+        }
+    });
+  }
