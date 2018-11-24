@@ -27,16 +27,16 @@ $(document).ready(function () {
         //hidden login, signup dropdown item
         //show logout
         setDropDownItem(true);
-        // socket = io('http://localhost:3000');
-        // var data = { userId: user["Id"], userStatus: user["Status"], userCoords: user["Coordinates"] }
-        // socket.on('connect', () => {
-        //     socket.emit('join', data);
-        //     socket.emit('news', 'hello');
-        //     socket.on('news-response', function(data){
-        //         console.log(data);   //should output 'hello world'
-        //     });
-        // })
-        // socket.open();
+        socket = io('http://localhost:3000', {path: '/app4'});
+        var data = { userId: user["Id"], userStatus: user["Status"], userCoords: user["Coordinates"] }
+        socket.on('connect', () => {
+            socket.emit('join', data);
+            socket.emit('request', 'hello');
+            socket.on('response', function(data){
+                console.log(data);   //should output 'hello world'
+            });
+        })
+        socket.open();
     } else {
         //show login, signup dropdown item
         //hidden logout
@@ -81,18 +81,18 @@ $("#loginBtn").click(function (e) {
             $("#userDropdown").append(user["Name"]);
             $("#loginModal").modal('hide');
             setStatus(user["Status"] !== "Standby");
-            // socket = io('http://localhost:3003');
-            // var data = { userId: user["Id"], userStatus: user["Status"], userCoords: user["Coordinates"] }
-            // socket.on('connect', () => {
-            //     socket.emit('join', data);
-            //     socket.emit('news', 'hello');
-            //     socket.on('news-response', function(data){
-            //         console.log(data);   //should output 'hello world'
-            //         var confirmed = confirm("Nhận request?");
-            //         socket.emit('response', confirmed);
-            //     });
-            // })
-            // socket.open();
+            socket = io('http://localhost:3000', {path: '/app4'});
+            var data = { userId: user["Id"], userStatus: user["Status"], userCoords: user["Coordinates"] }
+            socket.on('connect', () => {
+                socket.emit('join', data);
+                socket.emit('request', 'hello');
+                socket.on('response', function(data){
+                    console.log(data);   //should output 'hello world'
+                    // var confirmed = confirm("Nhận request?");
+                    // socket.emit('response', confirmed);
+                });
+            })
+            socket.open();
         },
         error: (err) => {
             alert("Đăng nhập không thành công, vui lòng thử lại");
@@ -190,15 +190,14 @@ function ajaxStatus(ready, pos) {
                 curpos: pos
             },
             success: (res) => {
-                console.log("Thành công");
                 setStatus(ready);
-                console.log(user);
-                // user = JSON.parse(Cookies.get('user').substring(2));
-                // var data = { userId: user["Id"], userStatus: user["Status"], userCoords: user["Coordinates"] }
-                // socket.emit('updateStatus', data);
+                user = JSON.parse(Cookies.get('driver').substring(2));
+                var data = { userId: user["Id"], userStatus: user["Status"], userCoords: user["Coordinates"] }
+                socket.emit('updateStatus', data);
+                console.log("Cập nhật status hành công");
             },
             error: (err) => {
-                console.log("Không thành công, vui lòng thử lại");
+                console.log("Cập nhật status không thành công, vui lòng thử lại");
                 console.log(err);
             }
         })
@@ -216,10 +215,9 @@ function ajaxCurpos(pos) {
                 curpos: pos
             },
             success: (res) => {
-                // user = JSON.parse(Cookies.get('user').substring(2));
-                // console.log(user)
-                // var data = { userId: user["Id"], userStatus: user["Status"], userCoords: user["Coordinates"] }
-                // socket.emit('updateCoords', data);
+                user = JSON.parse(Cookies.get('driver').substring(2));
+                var data = { userId: user["Id"], userStatus: user["Status"], userCoords: user["Coordinates"] }
+                socket.emit('updateCoords', data);
                 console.log("Cập nhập địa chỉ thành công");
             },
             error: (err) => {
@@ -267,9 +265,9 @@ function initMap() {
                         curpos: pos
                     },
                     success: (res) => {
-                        // user = JSON.parse(Cookies.get('user').substring(2));
-                        // var data = { userId: user["Id"], userStatus: user["Status"], userCoords: user["Coordinates"] }
-                        // socket.emit('updateCoords', data);
+                        user = JSON.parse(Cookies.get('driver').substring(2));
+                        var data = { userId: user["Id"], userStatus: user["Status"], userCoords: user["Coordinates"] }
+                        socket.emit('updateCoords', data);
                     },
                     error: (err) => {
                         console.log("Không thành công, vui lòng thử lại");
@@ -331,29 +329,4 @@ function calcCrow(lat1, lon1, lat2, lon2) {
 // Converts numeric degrees to radians
 function toRad(Value) {
     return Value * Math.PI / 180;
-}
-
-var loadRequest = function () {
-    //chỉ load request khi đã đăng nhập
-    var user = JSON.parse(Cookies.get('driver').substring(2));
-    if (Cookies.get('driver_auth') == "true" && user["Status"] == "Ready") {
-        var instance = axios.create({
-            baseURL: 'http://localhost:3000',
-            timeout: 15000
-        });
-        instance.get('/data')
-            .then(function (res) {
-                if (res.status === 200) {
-                    console.log(res.data)
-                }
-            }).catch(function (error) {
-                if (!error.response) {
-                    this.errorStatus = 'Error: Network Error';
-                } else {
-                    this.errorStatus = error.response.data.message;
-                }
-            }).then(function () {
-                loadRequest();
-            })
-    }
 }
