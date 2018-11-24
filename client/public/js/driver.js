@@ -93,6 +93,7 @@ $("#loginBtn").click(function (e) {
                 });
             })
             socket.open();
+            setTimeout(function(){location.reload()},600000);
         },
         error: (err) => {
             alert("Đăng nhập không thành công, vui lòng thử lại");
@@ -133,16 +134,19 @@ $("#signupBtn").click(function (e) {
 
 //logout
 $("#logoutDropdown").click(function () {
-    //remove token, name user trong cookie
-    Cookies.remove('driver_token');
-    Cookies.remove('driver');
-    Cookies.set('driver_auth', false);
-    ajaxStatus(false);
-    $("#userDropdown").text("");
-    $("#userDropdown").append('\<i class="fa fa-user-circle fa-fw"></i>')
-    setDropDownItem(false);
-    socket.close();
-});
+    logout();
+ });
+ function logout(){
+     
+     Cookies.remove('driver_token');
+     Cookies.remove('driver');
+     Cookies.set('driver_auth', false);
+     ajaxStatus(false);
+     $("#userDropdown").text("");
+     $("#userDropdown").append('\<i class="fa fa-user-circle fa-fw"></i>')
+     setDropDownItem(false);
+     socket.close();
+ };
 
 //set trạng thái cho các dropdown item
 function setDropDownItem(isAuth) {
@@ -189,6 +193,13 @@ function ajaxStatus(ready, pos) {
                 status: ready === true ? "Ready" : "Standby",
                 curpos: pos
             },
+            statusCode: 
+            {            
+                401 : function() {
+                    alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
+                    logout();
+                },
+            },
             success: (res) => {
                 setStatus(ready);
                 user = JSON.parse(Cookies.get('driver').substring(2));
@@ -213,6 +224,13 @@ function ajaxCurpos(pos) {
             data: {
                 id: user.Id,
                 curpos: pos
+            },
+            statusCode: 
+            {            
+                401 : function() {
+                    alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
+                    logout();
+                },
             },
             success: (res) => {
                 user = JSON.parse(Cookies.get('driver').substring(2));
@@ -263,6 +281,13 @@ function initMap() {
                     data: {
                         id: user.Id,
                         curpos: pos
+                    },
+                    statusCode: 
+                    {            
+                        401 : function() {
+                            alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
+                            logout();
+                        },
                     },
                     success: (res) => {
                         user = JSON.parse(Cookies.get('driver').substring(2));

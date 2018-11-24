@@ -87,15 +87,18 @@ $("#requestBtn").click(function (e) {
         success: (res) => {
             alert("Thành công");
         },
-        error: (err) => {
-            //bad login
-            if (err.status == 403) {
+        statusCode: 
+        {            
+            401 : function() {
+                alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
+                logout();
+            },
+            403: function() {
                 alert("Vui lòng đăng nhập trước khi đặt xe");
                 $("#loginModal").modal('show');
-            }
-            else {
-                alert("Có lỗi xảy ra, vui lòng thử lại sau");
-            }
+            }       
+        },
+        error: (err) => {
             console.log(err);
         }
     })
@@ -119,6 +122,8 @@ $("#loginBtn").click(function (e) {
             var user = JSON.parse(Cookies.get('user').substring(2));
             $("#userDropdown").append(user["Name"]);
             $("#loginModal").modal('hide');
+            setTimeout(function(){  alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
+                                    logout();},600000);
         },
         error: (err) => {
             alert("Đăng nhập không thành công, vui lòng thử lại");
@@ -158,14 +163,18 @@ $("#signupBtn").click(function (e) {
 });
 
 //logout
+function logout() {
+  //remove token, name user trong cookie
+  Cookies.remove('user_token');
+  Cookies.remove('user');
+  Cookies.set('user_auth', false);
+  $("#userDropdown").text("");
+  $("#userDropdown").append('\<i class="fa fa-user-circle fa-fw"></i>')
+  setDropDownItem(false);
+}
+
 $("#logoutDropdown").click(function () {
-    //remove token, name user trong cookie
-    Cookies.remove('user_token');
-    Cookies.remove('user');
-    Cookies.set('user_auth', false);
-    $("#userDropdown").text("");
-    $("#userDropdown").append('\<i class="fa fa-user-circle fa-fw"></i>')
-    setDropDownItem(false);
+  logout();
 });
 
 //set trạng thái cho các dropdown item

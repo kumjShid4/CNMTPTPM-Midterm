@@ -89,6 +89,13 @@ $("#loginBtn").click(function (e) {
         method: 'POST',
         url: '/user/login',
         data: data,
+        statusCode: 
+        {            
+            401 : function() {
+                alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
+                logout();
+            },
+        },
         success: (res) => {
             alert("Thành công");
             setDropDownItem(true);
@@ -97,6 +104,9 @@ $("#loginBtn").click(function (e) {
             $("#userDropdown").append(user["Name"]);
             $("#loginModal").modal('hide');
             loadRequest();
+            setTimeout(function(){location.reload(); 
+                alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
+                 logout();},600000);
         },
         error: (err) => {
             alert("Đăng nhập không thành công, vui lòng thử lại");
@@ -136,18 +146,22 @@ $("#signupBtn").click(function (e) {
 });
 
 //logout
+function logout() {
+ //remove token, name user trong cookie
+ Cookies.remove('identifier_token');
+ Cookies.remove('identifier');
+ Cookies.set('identifier_auth', false);
+ $("#userDropdown").text("");
+ $("#userDropdown").append('\<i class="fa fa-user-circle fa-fw"></i>')
+ setDropDownItem(false);
+ //clear table data
+ $("#dataTable tbody").empty();
+ //set id request = 0
+ id = 0;
+}
+
 $("#logoutDropdown").click(function () {
-    //remove token, name user trong cookie
-    Cookies.remove('identifier_token');
-    Cookies.remove('identifier');
-    Cookies.set('identifier_auth', false);
-    $("#userDropdown").text("");
-    $("#userDropdown").append('\<i class="fa fa-user-circle fa-fw"></i>')
-    setDropDownItem(false);
-    //clear table data
-    $("#dataTable tbody").empty();
-    //set id request = 0
-    id = 0;
+   logout();
 });
 
 //set trạng thái cho các dropdown item
@@ -191,6 +205,13 @@ $(document).on("click", ".dinhvi", function () {
                 "id": id,
                 "address": address
             }),
+            statusCode: 
+            {            
+                401 : function() {
+                    alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
+                    logout();
+                },
+            },
             success: (res) => {
                 $("#status" + id).text("Đã định vị");
                 //định vị địa chỉ gốc trên map
@@ -282,6 +303,13 @@ function markerCoords(markerobject) {
                                     "id": $(val).attr('id'),
                                     "newAddress": results[0].formatted_address
                                 }),
+                                statusCode: 
+                                {            
+                                    401 : function() {
+                                        alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
+                                        logout();
+                                    },
+                                },
                                 success: (res) => {
                                     $("#status" + id).text("Đã định vị");
                                     //định vị địa chỉ mới trên map

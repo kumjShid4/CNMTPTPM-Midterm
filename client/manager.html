@@ -57,9 +57,11 @@
 												<tr id="{{Id}}">
 													<td id="createdTime{{Id}}">{{CreatedTime}}</td>
 													<td id="name{{Id}}">{{Name}}<br>{{Phone}}</td>
-													<td id="newAddr{{Id}}" class="{{Id}}"><a class="dinhvi" href="javascript:;" style="color: #00B140;">{{NewAddress}}</a></td>
+													<td id="Addr{{Id}}" class="{{Id}}"><a class="dinhvi" href="javascript:;" style="color: #00B140;">{{Address}}</a></td>
 													<td id="note{{Id}}">{{Note}}</td>
-													<td id="driver{{Id}}">{{DriverId.Name}}<br>{{DriverId.Phone}}<br>{{DriverId.Email}}<br>{{DriverId.Status}}</td>
+													<td id="driver{{Id}}">{{Driver.Name}}<br>{{Driver.Phone}}</td>
+													<input id="startcoor{{Id}}"  type="hidden" value="{{Driver.Coordinates}}"/>
+													<input id="endcoor{{Id}}"  type="hidden" value="{{CurCoordinates}}"/>
 													<td id="status{{Id}}">{{Status}}</td>
 												</tr>
 												{{/each}}
