@@ -1,4 +1,6 @@
 //Định vị địa chỉ gốc của người dùng
+
+
 $(document).on("click", ".dinhvi", function () {
     var id = $(this).parent().attr('class'); //id request 
     var status= $("#status"+id).text();
@@ -15,13 +17,18 @@ $(document).on("click", ".dinhvi", function () {
     //kiểm tra địa chỉ mới đã cập nhật chưa
     //nếu chưa cập nhật địa chỉ mới thì định vị địa chỉ cũ
     //ngược lại định vị địa chỉ mới
+    
     if (status==='Đã nhận xe'){
+        if (directionsDisplay != null) {
+            directionsDisplay.setMap(null);
+            directionsDisplay = null;
+        }
         var tempstartcoor=$("#startcoor"+id).val();
         var startcoor=JSON.parse(tempstartcoor);
         var tempendcoor=$("#endcoor"+id).val();
         var endcoor=JSON.parse(tempendcoor);
-        var directionsDisplay = new google.maps.DirectionsRenderer();
         var directionsService = new google.maps.DirectionsService();
+        directionsDisplay = new google.maps.DirectionsRenderer();
         directionsDisplay.setMap(map);
          calcRoute(directionsService,directionsDisplay,startcoor,endcoor);
         console.log(startcoor);
@@ -35,6 +42,7 @@ $(document).on("click", ".dinhvi", function () {
 //map, geocoder, marker
 var map, geocoder, marker;
 var pos = { lat: -34.397, lng: 150.644 };
+var directionsDisplay = null;
 //initMap
 function initMap() {
     geocoder = new google.maps.Geocoder();
@@ -136,8 +144,15 @@ var loadRequest = function () {
                 console.log(res.data.requests);
                 document.getElementById('list').innerHTML = html;
             }
+
         }).catch(function(err) {
             console.log(err);
+            if (err.response.status === 401)
+            {
+                alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
+                logout(); 
+                $("#loginModal").modal('show');
+            }
         }).then(function() {
             loadRequest();
         })
@@ -216,11 +231,9 @@ $("#loginBtn").click(function (e) {
             $("#userDropdown").append(user["Name"]);
             $("#loginModal").modal('hide');
             loadRequest();
-            setTimeout(function(){location.reload(); 
-                                    alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
-                                     logout();},600000);
-           
-         
+            setTimeout(function(){  alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
+                                    logout();
+                                    $("#loginModal").modal('show');},600000);
         },
         error: (err) => {
             alert("Đăng nhập không thành công, vui lòng thử lại");

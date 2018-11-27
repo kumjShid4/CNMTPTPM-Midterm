@@ -93,7 +93,7 @@ $("#loginBtn").click(function (e) {
                 });
             })
             socket.open();
-            setTimeout(function(){location.reload()},600000);
+            setTimeout(function(){location.reload()},6000);
         },
         error: (err) => {
             alert("Đăng nhập không thành công, vui lòng thử lại");
@@ -198,6 +198,7 @@ function ajaxStatus(ready, pos) {
                 401 : function() {
                     alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
                     logout();
+                    $("#loginModal").modal('show');
                 },
             },
             success: (res) => {
@@ -230,6 +231,7 @@ function ajaxCurpos(pos) {
                 401 : function() {
                     alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
                     logout();
+                    $("#loginModal").modal('show');
                 },
             },
             success: (res) => {
@@ -287,6 +289,7 @@ function initMap() {
                         401 : function() {
                             alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
                             logout();
+                            $("#loginModal").modal('show');
                         },
                     },
                     success: (res) => {

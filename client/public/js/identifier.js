@@ -89,13 +89,6 @@ $("#loginBtn").click(function (e) {
         method: 'POST',
         url: '/user/login',
         data: data,
-        statusCode: 
-        {            
-            401 : function() {
-                alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
-                logout();
-            },
-        },
         success: (res) => {
             alert("Thành công");
             setDropDownItem(true);
@@ -104,9 +97,10 @@ $("#loginBtn").click(function (e) {
             $("#userDropdown").append(user["Name"]);
             $("#loginModal").modal('hide');
             loadRequest();
-            setTimeout(function(){location.reload(); 
+            setTimeout(function(){
                 alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
-                 logout();},600000);
+                 logout();
+                 $("#loginModal").modal('show');},600000);
         },
         error: (err) => {
             alert("Đăng nhập không thành công, vui lòng thử lại");
@@ -210,6 +204,7 @@ $(document).on("click", ".dinhvi", function () {
                 401 : function() {
                     alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
                     logout();
+                    $("#loginModal").modal('show');
                 },
             },
             success: (res) => {
@@ -308,6 +303,7 @@ function markerCoords(markerobject) {
                                     401 : function() {
                                         alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
                                         logout();
+                                        $("#loginModal").modal('show')
                                     },
                                 },
                                 success: (res) => {
