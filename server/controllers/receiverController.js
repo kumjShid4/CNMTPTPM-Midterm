@@ -6,6 +6,6 @@ router.post('/', (req, res) => {
     var request = req.body;
     repo.addRequest(request);
     res.redirect('/');
-})
+});
 
 module.exports = router;

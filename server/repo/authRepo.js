@@ -11,14 +11,14 @@ exports.generateAccessToken = userEntity => {
     var payload = {
         user: userEntity,
         info: 'more info'
-    }
+    };
 
     var token = jwt.sign(payload, SECRET, {
         expiresIn: AC_LIFETIME
     });
 
     return token;
-}
+};
 
 exports.verifyAuthenticationUser = (req, res, next) => {
     var token = req.cookies.user_token;
@@ -29,7 +29,7 @@ exports.verifyAuthenticationUser = (req, res, next) => {
                 res.json({
                     msg: 'INVALID TOKEN',
                     error: err
-                })
+                });
             } else {
                 req.token_payload = payload;
                 next();
@@ -39,9 +39,9 @@ exports.verifyAuthenticationUser = (req, res, next) => {
         res.statusCode = 403;
         res.json({
             msg: 'NO_TOKEN'
-        })
+        });
     }
-}
+};
 
 exports.verifyAuthenticationIdentifier = (req, res, next) => {
     var token = req.cookies.identifier_token;
@@ -52,7 +52,7 @@ exports.verifyAuthenticationIdentifier = (req, res, next) => {
                 res.json({
                     msg: 'INVALID TOKEN',
                     error: err
-                })
+                });
             } else {
                 req.token_payload = payload;
                 next();
@@ -62,9 +62,9 @@ exports.verifyAuthenticationIdentifier = (req, res, next) => {
         res.statusCode = 403;
         res.json({
             msg: 'NO_TOKEN'
-        })
+        });
     }
-}
+};
 
 exports.verifyAuthenticationManager = (req, res, next) => {
     var token = req.cookies.manager_token;
@@ -75,7 +75,7 @@ exports.verifyAuthenticationManager = (req, res, next) => {
                 res.json({
                     msg: 'INVALID TOKEN',
                     error: err
-                })
+                });
             } else {
                 req.token_payload = payload;
                 next();
@@ -85,9 +85,9 @@ exports.verifyAuthenticationManager = (req, res, next) => {
         res.statusCode = 403;
         res.json({
             msg: 'NO_TOKEN'
-        })
+        });
     }
-}
+};
 
 exports.verifyAuthenticationDriver = (req, res, next) => {
     var token = req.cookies.driver_token;
@@ -98,7 +98,7 @@ exports.verifyAuthenticationDriver = (req, res, next) => {
                 res.json({
                     msg: 'INVALID TOKEN',
                     error: err
-                })
+                });
             } else {
                 req.token_payload = payload;
                 next();
@@ -108,14 +108,14 @@ exports.verifyAuthenticationDriver = (req, res, next) => {
         res.statusCode = 403;
         res.json({
             msg: 'NO_TOKEN'
-        })
+        });
     }
-}
+};
 
 exports.generateRefreshToken = () => {
     const SIZE = 80;
     return rndToken.generate(SIZE);
-}
+};
 
 exports.updateRefreshToken = (userId, rfToken) => {
     return new Promise((resolve, reject) => {
@@ -129,4 +129,4 @@ exports.updateRefreshToken = (userId, rfToken) => {
             .then(value => resolve(value))
             .catch(err => reject(err));
     });
-}
+};

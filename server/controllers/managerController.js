@@ -1,11 +1,28 @@
 var express = require('express'),
     repo = require('../repo/repo'),
     userRepo = require('../repo/userRepo'),
-    datetime = require('date-and-time');
+    datetime = require('date-and-time'),
+    pool = require('../db/db').pool;
 
 var router = express.Router();
 
+var data = [];
 var requestReceived = [];
+
+function realtime() {
+    pool.getConnection(function (err, connection) {
+        // Use the connection
+        connection.query('SELECT * FROM requests', function (error, results, fields) {
+            data = results;
+            connection.release();
+
+            // Handle error after the release.
+            if (error) throw error;
+
+            // Don't use the connection here, it has been returned to the pool.
+        });
+    });
+}
 
 // Get requests
 router.get('/', (req, res) => {
@@ -31,8 +48,8 @@ router.get('/', (req, res) => {
         console.log(err);
         res.statusCode = 500;
         res.end('View error log on console');
-    })
-})
+    });
+});
 
 // Xử lý request
 router.get('/receiving', (req, res) => {
@@ -48,15 +65,15 @@ router.get('/receiving', (req, res) => {
                 res.json({
                     requests: request,
                     isAll: false
-                })
+                });
             }).catch(err => {
                 console.log(err);
                 request[0].DriverId = null;
                 res.json({
                     requests: request,
                     isAll: false
-                })
-            })
+                });
+            });
         } else {
             loop++;
             console.log(`loop: ${loop}`);
@@ -67,17 +84,17 @@ router.get('/receiving', (req, res) => {
                 res.end('No data');
             }
         }
-    }
+    };
 
     fn();
-})
+});
 
-// Nhận 1 request
-router.post('/', (req, res) => {
-    requestReceived = req.body;
-    res.redirect('/');
-})
-
-
+//get request
+router.get('/getExistDataChanged', (req, res) => {
+    realtime();
+    var id = req.query.id;
+    var newData = data.filter(r => r.Id <= id);
+    res.json({newData : newData});
+});
 
 module.exports = router;

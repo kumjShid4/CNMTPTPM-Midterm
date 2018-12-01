@@ -73,7 +73,7 @@ router.post('/login', (req, res) => {
                         user: userEntity,
                         access_token: acToken,
                         refresh_token: rfToken
-                    })
+                    });
                 })
                 .catch(err => {
                     console.log(err);
@@ -105,7 +105,7 @@ router.post('/login', (req, res) => {
                     }
                     res.statusCode = 500;
                     res.end('View error log on console');
-                })
+                });
         } else {
             //remove token, name trong cookie
             //set auth = false
@@ -136,7 +136,7 @@ router.post('/login', (req, res) => {
             res.statusCode = 401;
             res.json({
                 auth: false
-            })
+            });
         }
     });
 });

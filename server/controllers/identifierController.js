@@ -4,6 +4,7 @@ var sendRequest = require('request');
 var request = [];
 var pool = require('../db/db').pool;
 var repo = require('../repo/repo');
+var fs = require('fs');
 
 function realtime() {
     pool.getConnection(function (err, connection) {
@@ -19,6 +20,7 @@ function realtime() {
         });
     });
 }
+
 //get request
 router.get('/', (req, res) => {
     realtime();
@@ -29,6 +31,7 @@ router.get('/', (req, res) => {
     var loop = 0;
     var fn = () => {
         var requests = request.filter(r => r.Id > id);
+        var oldData = requests;
         var max_id = request.length;
         if (requests.length > 0) {
             res.json({ max_id, requests });
@@ -41,9 +44,9 @@ router.get('/', (req, res) => {
                 res.end('no data');
             }
         }
-    }
+    };
     fn();
-})
+});
 
 //định vị request
 router.post('/update', (req, res) => {
@@ -54,33 +57,33 @@ router.post('/update', (req, res) => {
         id = +req.body.id;
     }
     if (request.some(r => r.Id === id)) {
-        if (request[id - 1]['Status'] === "Chưa định vị") {
-            request[id - 1]['Status'] = "Đã định vị";
+        if (request[id - 1].Status === "Chưa định vị") {
+            request[id - 1].Status = "Đã định vị";
             if (address != null) {
                 getCoordinates(address, function (location) {
                     if (location) {
-                        request[id - 1]['CurCoordinates'] = location;
+                        request[id - 1].CurCoordinates = location;
                         repo.updateRequest(request[id - 1]);
                     }
                     else {
                         res.statusCode = 404;
                         res.json({ "status": "not found coordinates" });
                     }
-                })
+                });
             }
         }
         if (newAddress != null) {
             getCoordinates(newAddress, function (location) {
                 if (location) {
-                    request[id - 1]['NewCoordinates'] = location;
-                    request[id - 1]['NewAddress'] = newAddress;
+                    request[id - 1].NewCoordinates = location;
+                    request[id - 1].NewAddress = newAddress;
                     repo.updateRequest(request[id - 1]);
                 }
                 else {
                     res.statusCode = 404;
                     res.json({ "status": "not found coordinates" });
                 }
-            })
+            });
         }
         res.statusCode = 200;
         res.json({ "id": id, "status": "ok" });
@@ -89,7 +92,7 @@ router.post('/update', (req, res) => {
         res.statusCode = 404;
         res.json({ "status": "not found" });
     }
-})
+});
 
 function getCoordinates(address, callback) {
     address = address.replace(" ", "+"); // replace all the white space with "+" sign to match with google search pattern
@@ -103,7 +106,7 @@ function getCoordinates(address, callback) {
             address: address,
             key: apiKey
         }
-    }
+    };
     sendRequest(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             // var info = JSON.parse(body);
@@ -114,5 +117,12 @@ function getCoordinates(address, callback) {
     });
 }
 
+//get request
+router.get('/getExistDataChanged', (req, res) => {
+    realtime();
+    var id = req.query.id;
+    var newData = request.filter(r => r.Id <= id);
+    res.json({newData : newData});
+});
 
 module.exports = router;

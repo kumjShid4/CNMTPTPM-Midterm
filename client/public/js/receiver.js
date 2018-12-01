@@ -28,7 +28,7 @@ $(document).ready(function () {
     if (Cookies.get('user_auth') == "true") {
         //thêm tên user
         var user = JSON.parse(Cookies.get('user').substring(2));
-        $("#userDropdown").append(user["Name"]);
+        $("#userDropdown").append(user.Name);
         //hidden login, signup dropdown item
         //show logout
         setDropDownItem(true);
@@ -54,7 +54,7 @@ $("#loginForm").keyup(function() {
     if (allFilled) {
         $('#loginBtn').removeAttr('disabled');
     }
-})
+});
 
 //Kiểm tra các input của form signup
 //Nếu có một input rỗng, disable button signup
@@ -71,7 +71,7 @@ $("#signupForm").keyup(function() {
     if (allFilled) {
         $('#signupBtn').removeAttr('disabled');
     }
-})
+});
 
 //event click request button
 $("#requestBtn").click(function (e) {
@@ -101,7 +101,7 @@ $("#requestBtn").click(function (e) {
         error: (err) => {
             console.log(err);
         }
-    })
+    });
 });
 
 //event login button click
@@ -120,7 +120,7 @@ $("#loginBtn").click(function (e) {
             setDropDownItem(true);
             //thêm tên user
             var user = JSON.parse(Cookies.get('user').substring(2));
-            $("#userDropdown").append(user["Name"]);
+            $("#userDropdown").append(user.Name);
             $("#loginModal").modal('hide');
             setTimeout(function(){  alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
                                     logout();},600000);
@@ -129,7 +129,7 @@ $("#loginBtn").click(function (e) {
             alert("Đăng nhập không thành công, vui lòng thử lại");
             console.log(err);
         }
-    })
+    });
 });
 
 //event signup button click
@@ -156,7 +156,7 @@ $("#signupBtn").click(function (e) {
                     alert("Đăng kí không thành công, vui lòng thử lại");                    
                 }
             }
-        })
+        });
     } else {
         alert("Mật khẩu xác nhận không đúng");
     }
@@ -169,7 +169,7 @@ function logout() {
   Cookies.remove('user');
   Cookies.set('user_auth', false);
   $("#userDropdown").text("");
-  $("#userDropdown").append('\<i class="fa fa-user-circle fa-fw"></i>')
+  $("#userDropdown").append('\<i class="fa fa-user-circle fa-fw"></i>');
   setDropDownItem(false);
 }
 

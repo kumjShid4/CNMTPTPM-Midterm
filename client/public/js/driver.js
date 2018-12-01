@@ -1,4 +1,6 @@
 var socket = null;
+var requestReceived = null;
+var directionsDisplay = null;
 
 //Kiểm tra các input của form login
 //Nếu có một input rỗng, disable button login
@@ -15,34 +17,78 @@ $("#loginForm").keyup(function () {
     if (allFilled) {
         $('#loginBtn').removeAttr('disabled');
     }
-})
+});
 
 $(document).ready(function () {
+    $("#startBtn").css("display", "none");
+    $("#finishBtn").css("display", "none");
     //check login
     if (Cookies.get('driver_auth') == "true") {
         //thêm tên user
         var user = JSON.parse(Cookies.get('driver').substring(2));
-        $("#userDropdown").append(user["Name"]);
-        setStatus(user["Status"] !== "Standby");
+        $("#userDropdown").append(user.Name);
+        setStatus(user.Status !== "Standby");
         //hidden login, signup dropdown item
         //show logout
         setDropDownItem(true);
-        socket = io('http://localhost:3000', {path: '/app4'});
-        var data = { userId: user["Id"], userStatus: user["Status"], userCoords: user["Coordinates"] }
+        socket = io('http://localhost:3000', { path: '/app4' });
         socket.on('connect', () => {
-            socket.emit('join', data);
-            socket.emit('request', 'hello');
-            socket.on('response', function(data){
-                console.log(data);   //should output 'hello world'
-            });
-        })
+            socket.emit('join', user.Id);
+        });
+
+        socket.on("driver" + user.Id, (request) => {
+            $("#receivingModal").modal('show');
+            setReceiverInfoModal(request);
+            requestReceived = request;
+            setTimeout(() => {
+                $("#receivingModal").modal('hide');
+            }, 10000);
+        });
         socket.open();
     } else {
         //show login, signup dropdown item
         //hidden logout
         setDropDownItem(false);
     }
-})
+});
+
+$("#startBtn").click(function () {
+    $("#startBtn").attr("disabled", "true");
+    $("#finishBtn").removeAttr('disabled');
+});
+
+$("#finishBtn").click(function () {
+    $("#startBtn").removeAttr('disabled');
+    $("#startBtn").css("display", "none");
+    $("#finishBtn").css("display", "none");
+    setReceiverInfoModal(undefined);
+    setReceiverInfo(undefined);
+    var user = JSON.parse(Cookies.get('driver').substring(2));
+    $.ajax({
+        method: 'POST',
+        url: '/driver/status',
+        data: {
+            id: user.Id,
+            status: "Ready",
+            curpos: curpos
+        },
+        statusCode:
+        {
+            401: function () {
+                alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
+                logout();
+                $("#loginModal").modal('show');
+            },
+        },
+        success: (res) => {
+            setStatus(ready);
+        },
+        error: (err) => {
+            console.log(err);
+        }
+    });
+    directionsDisplay.setMap(null);
+});
 
 //Kiểm tra các input của form signup
 //Nếu có một input rỗng, disable button signup
@@ -59,7 +105,70 @@ $("#signupForm").keyup(function () {
     if (allFilled) {
         $('#signupBtn').removeAttr('disabled');
     }
-})
+});
+
+$("#receivedBtn").click(function () {
+    $("#receivingModal").modal('hide');
+    var user = JSON.parse(Cookies.get('driver').substring(2));
+    $.ajax({
+        method: 'POST',
+        url: '/driver/received',
+        data: {
+            idReq: requestReceived.Id,
+            idDriver: user.Id,
+            curpos: curpos
+        },
+        success: (response) => {
+            console.log(response);
+        },
+        error: (error) => {
+            console.log(error);
+        }
+    });
+    setReceiverInfo(requestReceived);
+    var startcoor = JSON.parse(requestReceived.CurCoordinates);
+    var endcoor = {
+        lat: user.Coordinates.lat,
+        lng: user.Coordinates.lng
+    };
+    var directionsService = new google.maps.DirectionsService();
+    directionsDisplay = new google.maps.DirectionsRenderer();
+    directionsDisplay.setMap(map);
+    calcRoute(directionsService, directionsDisplay, startcoor, endcoor);
+    $("#startBtn").css("display", "inline-block");
+    $("#finishBtn").css("display", "inline-block");
+    $("#finishBtn").attr("disabled", "true");
+});
+
+function setReceiverInfo(request) {
+    if (request !== undefined) {
+    $("#receiverName").text("Tên: " + request.Name);
+    $("#receiverPhone").text("Số điện thoại: " + request.Phone);
+    $("#receiverAddr").text("Địa chỉ: " + request.Address);
+    $("#receiverNote").text("Ghi chú: " + request.Note);
+    }
+    else {
+        $("#receiverName").text("Tên: ");
+        $("#receiverPhone").text("Số điện thoại: ");
+        $("#receiverAddr").text("Địa chỉ: ");
+        $("#receiverNote").text("Ghi chú: ");
+    }
+}
+
+function setReceiverInfoModal(request) {
+    if (request !== undefined) {
+        $("#receiverNameModal").text("Tên: " + request.Name);
+        $("#receiverPhoneModal").text("Số điện thoại: " + request.Phone);
+        $("#receiverAddrModal").text("Địa chỉ: " + request.Address);
+        $("#receiverNoteModal").text("Ghi chú: " + request.Note);
+    }
+    else {
+        $("#receiverNameModal").text("Tên: ");
+        $("#receiverPhoneModal").text("Số điện thoại: ");
+        $("#receiverAddrModal").text("Địa chỉ: ");
+        $("#receiverNoteModal").text("Ghi chú: ");
+    }
+}
 
 //event login button click
 $("#loginBtn").click(function (e) {
@@ -78,28 +187,28 @@ $("#loginBtn").click(function (e) {
             setDropDownItem(true);
             var user = JSON.parse(Cookies.get('driver').substring(2));
             //thêm tên user
-            $("#userDropdown").append(user["Name"]);
+            $("#userDropdown").append(user.Name);
             $("#loginModal").modal('hide');
-            setStatus(user["Status"] !== "Standby");
-            socket = io('http://localhost:3000', {path: '/app4'});
-            var data = { userId: user["Id"], userStatus: user["Status"], userCoords: user["Coordinates"] }
+            setStatus(user.Status !== "Standby");
+            socket = io('http://localhost:3000', { path: '/app4' });
             socket.on('connect', () => {
-                socket.emit('join', data);
-                socket.emit('request', 'hello');
-                socket.on('response', function(data){
-                    console.log(data);   //should output 'hello world'
-                    // var confirmed = confirm("Nhận request?");
-                    // socket.emit('response', confirmed);
-                });
-            })
+                socket.emit('join', user.Id);
+            });
+            socket.on("driver" + user.Id, (request) => {
+                requestReceived = request;
+                $("#receivingModal").modal('show');
+                setReceiverInfoModal(request);
+                setTimeout(() => {
+                    $("#receivingModal").modal('hide');
+                }, 10000);
+            });
             socket.open();
-            setTimeout(function(){location.reload()},6000);
         },
         error: (err) => {
             alert("Đăng nhập không thành công, vui lòng thử lại");
             console.log(err);
         }
-    })
+    });
 });
 
 //event signup button click
@@ -123,10 +232,10 @@ $("#signupBtn").click(function (e) {
                 if (err.status == 400) {
                     alert("Tài khoản đã tồn tại");
                 } else {
-                    alert("Đăng kí không thành công, vui lòng thử lại");                    
+                    alert("Đăng kí không thành công, vui lòng thử lại");
                 }
             }
-        })
+        });
     } else {
         alert("Mật khẩu xác nhận không đúng");
     }
@@ -135,18 +244,18 @@ $("#signupBtn").click(function (e) {
 //logout
 $("#logoutDropdown").click(function () {
     logout();
- });
- function logout(){
-     
-     Cookies.remove('driver_token');
-     Cookies.remove('driver');
-     Cookies.set('driver_auth', false);
-     ajaxStatus(false);
-     $("#userDropdown").text("");
-     $("#userDropdown").append('\<i class="fa fa-user-circle fa-fw"></i>')
-     setDropDownItem(false);
-     socket.close();
- };
+});
+
+function logout() {
+    Cookies.remove('driver_token');
+    Cookies.remove('driver');
+    Cookies.set('driver_auth', false);
+    ajaxStatus(false);
+    $("#userDropdown").text("");
+    $("#userDropdown").append('\<i class="fa fa-user-circle fa-fw"></i>');
+    setDropDownItem(false);
+    socket.close();
+}
 
 //set trạng thái cho các dropdown item
 function setDropDownItem(isAuth) {
@@ -175,12 +284,12 @@ function setStatus(ready) {
 //status ready
 $("#ready").click(function () {
     ajaxStatus(true, curpos);
-})
+});
 
 //status standby
 $("#standby").click(function () {
     ajaxStatus(false, curpos);
-})
+});
 
 function ajaxStatus(ready, pos) {
     if (Cookies.get('driver_auth') == "true") {
@@ -193,9 +302,9 @@ function ajaxStatus(ready, pos) {
                 status: ready === true ? "Ready" : "Standby",
                 curpos: pos
             },
-            statusCode: 
-            {            
-                401 : function() {
+            statusCode:
+            {
+                401: function () {
                     alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
                     logout();
                     $("#loginModal").modal('show');
@@ -203,16 +312,12 @@ function ajaxStatus(ready, pos) {
             },
             success: (res) => {
                 setStatus(ready);
-                user = JSON.parse(Cookies.get('driver').substring(2));
-                var data = { userId: user["Id"], userStatus: user["Status"], userCoords: user["Coordinates"] }
-                socket.emit('updateStatus', data);
-                console.log("Cập nhật status hành công");
             },
             error: (err) => {
                 console.log("Cập nhật status không thành công, vui lòng thử lại");
                 console.log(err);
             }
-        })
+        });
     }
 }
 
@@ -226,25 +331,22 @@ function ajaxCurpos(pos) {
                 id: user.Id,
                 curpos: pos
             },
-            statusCode: 
-            {            
-                401 : function() {
+            statusCode:
+            {
+                401: function () {
                     alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
                     logout();
                     $("#loginModal").modal('show');
                 },
             },
             success: (res) => {
-                user = JSON.parse(Cookies.get('driver').substring(2));
-                var data = { userId: user["Id"], userStatus: user["Status"], userCoords: user["Coordinates"] }
-                socket.emit('updateCoords', data);
                 console.log("Cập nhập địa chỉ thành công");
             },
             error: (err) => {
                 console.log("Cập nhập địa chỉ không thành công, vui lòng thử lại");
                 console.log(err);
             }
-        })
+        });
     }
 }
 
@@ -284,24 +386,22 @@ function initMap() {
                         id: user.Id,
                         curpos: pos
                     },
-                    statusCode: 
-                    {            
-                        401 : function() {
+                    statusCode:
+                    {
+                        401: function () {
                             alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
                             logout();
                             $("#loginModal").modal('show');
                         },
                     },
                     success: (res) => {
-                        user = JSON.parse(Cookies.get('driver').substring(2));
-                        var data = { userId: user["Id"], userStatus: user["Status"], userCoords: user["Coordinates"] }
-                        socket.emit('updateCoords', data);
+
                     },
                     error: (err) => {
                         console.log("Không thành công, vui lòng thử lại");
                         console.log(err);
                     }
-                })
+                });
             }
 
             map.setCenter(pos);
@@ -321,7 +421,7 @@ function toggleBounce() {
 function markerCoords(markerobject) {
     google.maps.event.addListener(markerobject, 'dragend', function (evt) {
         geocoder.geocode({ 'location': evt.latLng }, function (results, status) {
-            if (calcCrow(curpos.lat, curpos.lng, marker.getPosition().lat(), marker.getPosition().lng()) <= 0.1) {
+            if (calcDistance(curpos.lat, curpos.lng, marker.getPosition().lat(), marker.getPosition().lng()) <= 0.1) {
                 curpos.lat = marker.getPosition().lat();
                 curpos.lng = marker.getPosition().lng();
                 ajaxCurpos(curpos);
@@ -330,7 +430,7 @@ function markerCoords(markerobject) {
                 map.setCenter(curpos);
                 marker.setPosition(curpos);
             }
-        })
+        });
 
     });
 
@@ -340,15 +440,15 @@ function markerCoords(markerobject) {
 
 }
 
-function calcCrow(lat1, lon1, lat2, lon2) {
+function calcDistance(lat1, lon1, lat2, lon2) {
     var R = 6371; // km
     var dLat = toRad(lat2 - lat1);
     var dLon = toRad(lon2 - lon1);
-    var lat1 = toRad(lat1);
-    var lat2 = toRad(lat2);
+    var l1 = toRad(lat1);
+    var l2 = toRad(lat2);
 
     var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+        Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(l1) * Math.cos(l2);
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     var d = R * c;
     return d;
@@ -357,4 +457,24 @@ function calcCrow(lat1, lon1, lat2, lon2) {
 // Converts numeric degrees to radians
 function toRad(Value) {
     return Value * Math.PI / 180;
+}
+
+// tìm đường đi
+function calcRoute(directionsService, directionsDisplay, startcoor, endcoor) {
+    var start = new google.maps.LatLng(startcoor.lat, startcoor.lng);
+    var end = new google.maps.LatLng(endcoor.lat, endcoor.lng);
+    var bounds = new google.maps.LatLngBounds();
+    var request = {
+        origin: start,
+        destination: end,
+        travelMode: 'DRIVING'
+    };
+    directionsService.route(request, function (response, status) {
+        if (status === 'OK') {
+            directionsDisplay.setDirections(response);
+            directionsDisplay.setMap(map);
+        } else {
+            alert("Directions Request from " + start.toUrlValue(6) + " to " + end.toUrlValue(6) + " failed: " + status);
+        }
+    });
 }

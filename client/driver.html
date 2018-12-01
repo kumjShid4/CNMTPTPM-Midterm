@@ -2,27 +2,20 @@
 <html lang="en">
 
 <head>
-
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<meta name="description" content="">
 	<meta name="author" content="">
-
 	<title>Driver</title>
-
 	<!-- Bootstrap core CSS-->
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
 	 crossorigin="anonymous">
-
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
 	<!-- Custom styles for this template-->
-	<!-- <link href="./public/css/custom.css" rel="stylesheet"> -->
 	<link rel="stylesheet" href="./public/css/index.css">
-
-
+	<link rel="icon" href="./public/image/favicon.png">
 </head>
 
 <body id="page-top">
@@ -73,14 +66,18 @@
 									</div>
 									<div class="col-9">
 										<div class="row">
-											<div class="col pt-2">
-												<p class="m-0 pl-2 font-weight-bold">Tên: A</p>
-												<p class="m-0 pl-2 font-weight-normal">Số điện
+											<div class="col-12 pt-2">
+												<p class="m-0 pl-2 font-weight-bold" id="receiverName">Tên: </p>
+												<p class="m-0 pl-2 font-weight-normal" id="receiverPhone">Số điện
 													thoại: </p>
-												<p class="m-0 pl-2 font-weight-bold">Địa chỉ:
+												<p class="m-0 pl-2 font-weight-bold" id="receiverAddr">Địa chỉ:
 												</p>
-												<p class="m-0 pl-2 font-weight-normal">Ghi chú:
+												<p class="m-0 pl-2 font-weight-normal" id="receiverNote">Ghi chú:
 												</p>
+											</div>
+											<div class="col-12">
+												<button type="button" class="btn btn-outline-primary" id="startBtn">Bắt đầu</button>
+												<button type="button" class="btn btn-outline-secondary" id="finishBtn">Kết thúc</button>
 											</div>
 										</div>
 									</div>
@@ -125,7 +122,7 @@
 											<label for="loginPassword">Password</label>
 											<input type="password" id="loginPassword" name="Password" class="form-control login" placeholder="Password"
 											 required="required">
-											<input type="hidden" name="Permission" value="3"/>
+											<input type="hidden" name="Permission" value="3" />
 										</div>
 									</div>
 									<button disabled id="loginBtn" type="submit" class="btn btn-lg btn-block btn-outline-success">Login</button>
@@ -139,7 +136,7 @@
 					<div class="modal-dialog" role="document">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title" id="loginModalLabel">Sign up</h5>
+								<h5 class="modal-title" id="signupModalLabel">Sign up</h5>
 								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 									<span aria-hidden="true">&times;</span>
 								</button>
@@ -192,7 +189,7 @@
 										<div class="form-label-group">
 											<label for="license">License</label>
 											<input type="text" id="License" name="License" class="form-control signup" placeholder="License" required="required">
-											<input type="hidden" name="Permission" value="3"/>											
+											<input type="hidden" name="Permission" value="3" />
 										</div>
 									</div>
 									<button id="signupBtn" type="submit" class="btn btn-lg btn-block btn-outline-primary">Sign
@@ -202,11 +199,36 @@
 						</div>
 					</div>
 				</div>
+				<!-- Modal Receiving Request -->
+				<div class="modal fade" id="receivingModal" tabindex="-1" role="dialog" aria-labelledby="receivingModalLabel"
+				 aria-hidden="true">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="receivingModalLabel">Nhận yêu cầu đặt xe</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<p class="m-0 pl-2 font-weight-bold" id="receiverNameModal">Tên: </p>
+								<p class="m-0 pl-2 font-weight-normal" id="receiverPhoneModal">Số điện
+									thoại: </p>
+								<p class="m-0 pl-2 font-weight-bold" id="receiverAddrModal">Địa chỉ:
+								</p>
+								<p class="m-0 pl-2 font-weight-normal" id="receiverNoteModal">Ghi chú:
+								</p>
+							</div>
+							<div class="modal-footer">
+								<button type="button" id="receivedBtn" class="btn btn-primary">Đồng ý</button>
+								<button type="button" id="refusedBtn" class="btn btn-secondary" data-dismiss="modal">Từ chối</button>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<!-- /.container-fluid -->
-	</div>
-	<!-- /.content-wrapper -->
 	</div>
 	<!-- /#wrapper -->
 	<!-- Bootstrap core JavaScript-->

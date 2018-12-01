@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <!-- Custom styles for this template-->
   <link rel="stylesheet" href="./public/css/index.css">
+  <link rel="icon" href="./public/image/favicon.png">
 </head>
 
 <body id="page-top">
@@ -105,7 +106,7 @@
                     <label for="loginPassword">Password</label>
                     <input type="password" id="loginPassword" name="Password" class="form-control login" placeholder="Password"
                       required="required">
-                    <input type="hidden" name="Permission" value="1"/>
+                    <input type="hidden" name="Permission" value="1" />
                   </div>
                 </div>
                 <button disabled id="loginBtn" type="submit" class="btn btn-lg btn-block btn-outline-success">Login</button>
@@ -167,7 +168,7 @@
                     <label for="confirmPassword">Confirm Password</label>
                     <input type="password" id="confirmPassword" name="confirmPassword" class="form-control signup"
                       placeholder="Confirm Password" required="required">
-										<input type="hidden" name="Permission" value="1"/>                    
+                    <input type="hidden" name="Permission" value="1" />
                   </div>
                 </div>
                 <button id="signupBtn" type="submit" class="btn btn-lg btn-block btn-outline-primary">Sign up</button>
@@ -193,7 +194,7 @@
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
   <script src="./public/js/identifier.js"></script>
   <script id="template" type="text/x-handlebars-template">
-      {{#each this}}
+    {{#each this}}
       <tr id="{{Id}}">
         <td id="name{{Id}}">{{Name}}</td>
         <td id="sdt{{Id}}">{{Phone}}</td>
