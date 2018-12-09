@@ -89,12 +89,28 @@ router.get('/receiving', (req, res) => {
     fn();
 });
 
-//get request
+//get changed request
 router.get('/getExistDataChanged', (req, res) => {
     realtime();
     var id = req.query.id;
     var newData = data.filter(r => r.Id <= id);
-    res.json({newData : newData});
+    repo.loadAllDriver().then(driver => {
+        for (let i = 0;i < newData.length;i++) {
+            if (newData[i].Status === 'Đã nhận xe') {
+                for (var j = 0;j < driver.length; j++) {
+                    if (driver[j].Id === newData[i].DriverId) {
+                        newData[i].Driver = driver[j];
+                        break;
+                    }
+                }
+            }
+        }
+        res.json({newData : newData});
+    }).catch(err => {
+        console.log(err);
+        res.statusCode = 500;
+        res.end('View error log on console');
+    });
 });
 
 module.exports = router;

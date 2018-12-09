@@ -3,7 +3,7 @@ $(document).on("click", ".dinhvi", function () {
     var id = $(this).parent().attr('class'); //id request 
     var status = $("#status" + id).text();
     var addr = $("#Addr" + id).text();
-    //set normat text cho tất cả các dòng
+    //set normal text cho tất cả các dòng
     $('tr').css({
         "color": "#000",
         "font-weight": "normal"
@@ -160,8 +160,14 @@ var loadRequest = function () {
                         },
                         success: (res) => {
                             res.newData.forEach(request => {
+                                // Cập nhật status
                                 if ($("#status" + request.Id).text() !== request.Status) {
                                     $("#status" + request.Id).text(request.Status);
+                                    // Cập nhật thông tin tài xế nếu request được nhận xe
+                                    if (request.Status === 'Đã nhận xe') {
+                                        $("#driver" + request.Id).text(request.Driver.Name);
+                                        $("#driver" + request.Id).append('<br>' + request.Driver.Phone);
+                                    }
                                 }
                             });
                         },
