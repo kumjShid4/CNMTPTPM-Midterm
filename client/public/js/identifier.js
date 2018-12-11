@@ -21,8 +21,8 @@ var loadRequest = function () {
                         data: {
                             id: id
                         },
-                        success: (res) => {
-                            res.newData.forEach(request => {
+                        success: (response) => {
+                            response.newData.forEach(request => {
                                 if ($("#status" + request.Id).text() !== request.Status) {
                                     $("#status" + request.Id).text(request.Status);
                                 }
@@ -220,8 +220,7 @@ $(document).on("click", ".dinhvi", function () {
                 "id": id,
                 "address": address
             }),
-            statusCode:
-            {
+            statusCode: {
                 401: function () {
                     alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
                     logout();
@@ -237,8 +236,7 @@ $(document).on("click", ".dinhvi", function () {
                 console.log(err);
             }
         });
-    }
-    else if (newAddr != "") {
+    } else if (newAddr != "") {
         //định vị địa chỉ mới trên map
         codeAddress(newAddr);
     } else {
@@ -249,7 +247,10 @@ $(document).on("click", ".dinhvi", function () {
 
 //map, geocoder, marker
 var map, geocoder, marker;
-var pos = { lat: -34.397, lng: 150.644 };
+var pos = {
+    lat: -34.397,
+    lng: 150.644
+};
 //initMap
 function initMap() {
     geocoder = new google.maps.Geocoder();
@@ -290,7 +291,9 @@ function toggleBounce() {
 
 //gecoding
 function codeAddress(address) {
-    geocoder.geocode({ 'address': address }, function (results, status) {
+    geocoder.geocode({
+        'address': address
+    }, function (results, status) {
         if (status == 'OK') {
             map.setCenter(results[0].geometry.location);
             marker.setPosition(results[0].geometry.location);
@@ -303,7 +306,9 @@ function codeAddress(address) {
 //reverse gecoding
 function markerCoords(markerobject) {
     google.maps.event.addListener(markerobject, 'dragend', function (evt) {
-        geocoder.geocode({ 'location': evt.latLng }, function (results, status) {
+        geocoder.geocode({
+            'location': evt.latLng
+        }, function (results, status) {
             //check OK
             if (status == 'OK') {
                 if (results[0]) {
@@ -324,8 +329,7 @@ function markerCoords(markerobject) {
                                         "id": $(val).attr('id'),
                                         "newAddress": results[0].formatted_address
                                     }),
-                                    statusCode:
-                                    {
+                                    statusCode: {
                                         401: function () {
                                             alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
                                             logout();
@@ -344,12 +348,10 @@ function markerCoords(markerobject) {
                             }
                         }
                     });
-                }
-                else {
+                } else {
                     console.log('No results found');
                 }
-            }
-            else {
+            } else {
                 console.log('Geocoder failed due to: ' + status);
             }
         });

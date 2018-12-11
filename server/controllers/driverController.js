@@ -53,5 +53,16 @@ router.post('/status', (req, res) => {
     });
 });
 
+//update driver status
+router.post('/reqStatus', (req, res) => {
+    var id = req.body.id;
+    var status = req.body.status;
+    repo.singleRequest(id).then(request => { 
+        request.Status = status;
+        repo.updateReqReceived(request);
+        res.statusCode = 200;
+        res.json({ "msg": "ok" });
+    });
+});
 
 module.exports = router;

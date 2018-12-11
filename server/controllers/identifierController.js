@@ -4,7 +4,6 @@ var sendRequest = require('request');
 var request = [];
 var pool = require('../db/db').pool;
 var repo = require('../repo/repo');
-var fs = require('fs');
 
 function realtime() {
     pool.getConnection(function (err, connection) {
@@ -31,13 +30,16 @@ router.get('/', (req, res) => {
     var loop = 0;
     var fn = () => {
         var requests = request.filter(r => r.Id > id);
-        var oldData = requests;
-        var max_id = request.length;
+        var max_id = Math.max.apply(Math, requests.map(function (o) {
+            return o.Id;
+        }));
         if (requests.length > 0) {
+            res.statusCode = 200;
             res.json({ max_id, requests });
         } else {
             loop++;
-            if (loop < 4) {
+            console.log(`loop: ${loop}`);
+            if (loop < 2) {
                 setTimeout(fn, 2500);
             } else {
                 res.statusCode = 204;
@@ -57,13 +59,14 @@ router.post('/update', (req, res) => {
         id = +req.body.id;
     }
     if (request.some(r => r.Id === id)) {
-        if (request[id - 1].Status === "Chưa định vị") {
-            request[id - 1].Status = "Đã định vị";
+        var obj = request.find(x => x.Id === id);
+        if (obj.Status === "Chưa định vị") {
+            obj.Status = "Đã định vị";
             if (address != null) {
                 getCoordinates(address, function (location) {
                     if (location) {
-                        request[id - 1].CurCoordinates = location;
-                        repo.updateRequest(request[id - 1]);
+                        obj.CurCoordinates = location;
+                        repo.updateRequest(obj);
                     }
                     else {
                         res.statusCode = 404;
@@ -75,9 +78,9 @@ router.post('/update', (req, res) => {
         if (newAddress != null) {
             getCoordinates(newAddress, function (location) {
                 if (location) {
-                    request[id - 1].NewCoordinates = location;
-                    request[id - 1].NewAddress = newAddress;
-                    repo.updateRequest(request[id - 1]);
+                    obj.NewCoordinates = location;
+                    obj.NewAddress = newAddress;
+                    repo.updateRequest(obj);
                 }
                 else {
                     res.statusCode = 404;
@@ -122,6 +125,7 @@ router.get('/getExistDataChanged', (req, res) => {
     realtime();
     var id = req.query.id;
     var newData = request.filter(r => r.Id <= id);
+    res.statusCode = 200;
     res.json({newData : newData});
 });
 

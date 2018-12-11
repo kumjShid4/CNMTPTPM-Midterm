@@ -27,7 +27,7 @@ $(document).ready(function () {
         //thêm tên user
         var user = JSON.parse(Cookies.get('driver').substring(2));
         $("#userDropdown").append(user.Name);
-        setStatus(user.Status !== "Standby");
+        setStatus(user.Status === "Ready");
         //hidden login, signup dropdown item
         //show logout
         setDropDownItem(true);
@@ -37,6 +37,7 @@ $(document).ready(function () {
         });
 
         socket.on("driver" + user.Id, (request) => {
+            console.log('received');
             $("#receivingModal").modal('show');
             setReceiverInfoModal(request);
             requestReceived = request;
@@ -54,6 +55,28 @@ $(document).ready(function () {
 
 $("#startBtn").click(function () {
     $("#startBtn").attr("disabled", "true");
+    $.ajax({
+        method: 'POST',
+        url: '/driver/reqStatus',
+        data: {
+            id: requestReceived.Id,
+            status: "Đang di chuyển"
+        },
+        statusCode:
+        {
+            401: function () {
+                alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
+                logout();
+                $("#loginModal").modal('show');
+            },
+        },
+        success: (res) => {
+            console.log(res);
+        },
+        error: (err) => {
+            console.log(err);
+        }
+    });
     $("#finishBtn").removeAttr('disabled');
 });
 
@@ -82,6 +105,28 @@ $("#finishBtn").click(function () {
         },
         success: (res) => {
             setStatus(ready);
+        },
+        error: (err) => {
+            console.log(err);
+        }
+    });
+    $.ajax({
+        method: 'POST',
+        url: '/driver/reqStatus',
+        data: {
+            id: requestReceived.Id,
+            status: "Đã hoàn thành"
+        },
+        statusCode:
+        {
+            401: function () {
+                alert('Phiên đã hết hạn, vui lòng đăng nhập lại');
+                logout();
+                $("#loginModal").modal('show');
+            },
+        },
+        success: (res) => {
+            console.log(res);
         },
         error: (err) => {
             console.log(err);
@@ -189,7 +234,7 @@ $("#loginBtn").click(function (e) {
             //thêm tên user
             $("#userDropdown").append(user.Name);
             $("#loginModal").modal('hide');
-            setStatus(user.Status !== "Standby");
+            setStatus(user.Status === "Ready");
             socket = io('http://localhost:3000', { path: '/app4' });
             socket.on('connect', () => {
                 socket.emit('join', user.Id);

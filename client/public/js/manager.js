@@ -158,23 +158,27 @@ var loadRequest = function () {
                         data: {
                             id: id
                         },
-                        success: (res) => {
-                            res.newData.forEach(request => {
-                                // Cập nhật status
-                                if ($("#status" + request.Id).text() !== request.Status) {
-                                    $("#status" + request.Id).text(request.Status);
-                                    // Cập nhật thông tin tài xế nếu request được nhận xe
-                                    if (request.Status === 'Đã nhận xe') {
-                                        $("#driver" + request.Id).text(request.Driver.Name);
-                                        $("#driver" + request.Id).append('<br>' + request.Driver.Phone);
+                        success: (response) => {
+                            if (response.status === 200) {
+                                response.newData.forEach(request => {
+                                    // Cập nhật status
+                                    if ($("#status" + request.Id).text() !== request.Status) {
+                                        $("#status" + request.Id).text(request.Status);
+                                        // Cập nhật thông tin tài xế nếu request được nhận xe
+                                        if (request.Driver !== undefined) {
+                                            console.log(request.Status);
+                                            $("#driver" + request.Id).text(request.Driver.Name);
+                                            $("#driver" + request.Id).append('<br>' + request.Driver.Phone);
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            }
                         },
                         error: (err) => {
                             console.log(err);
                         }
                     });
+                    s = '';
                 }
             }).catch(function (err) {
                 console.log(err);

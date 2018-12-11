@@ -31,7 +31,7 @@ router.get('/', (req, res) => {
     Promise.all([requests, driver]).then(([rowReq, rowDriver]) => {
         for (var i = 0; i < rowReq.length; i++) {
             rowReq[i].CreatedTime = datetime.format(new Date(rowReq[i].CreatedTime), 'DD-MM-YYYY HH:mm:ss');
-            if (rowReq[i].Status === 'Đã nhận xe') {
+            if (rowReq[i].Status === 'Đã nhận xe' || rowReq[i].Status === 'Đang di chuyển' || rowReq[i].Status === 'Đã hoàn thành') {
                 for (var j = 0;j < rowDriver.length; j++) {
                     if (rowDriver[j].Id === rowReq[i].DriverId) {
                         rowReq[i].Driver = rowDriver[j];
@@ -40,6 +40,7 @@ router.get('/', (req, res) => {
                 }
             }
         }
+        res.statusCode = 200;
         res.json({
             requests: rowReq,
             isAll: true
@@ -77,7 +78,7 @@ router.get('/receiving', (req, res) => {
         } else {
             loop++;
             console.log(`loop: ${loop}`);
-            if (loop < 4) {
+            if (loop < 2) {
                 setTimeout(fn, 2500);
             } else {
                 res.statusCode = 204;
@@ -96,7 +97,7 @@ router.get('/getExistDataChanged', (req, res) => {
     var newData = data.filter(r => r.Id <= id);
     repo.loadAllDriver().then(driver => {
         for (let i = 0;i < newData.length;i++) {
-            if (newData[i].Status === 'Đã nhận xe') {
+            if (newData[i].Status === 'Đã nhận xe' || newData[i].Status === 'Đang di chuyển' || newData[i].Status === 'Đã hoàn thành') {
                 for (var j = 0;j < driver.length; j++) {
                     if (driver[j].Id === newData[i].DriverId) {
                         newData[i].Driver = driver[j];
@@ -105,6 +106,7 @@ router.get('/getExistDataChanged', (req, res) => {
                 }
             }
         }
+        res.statusCode = 200;
         res.json({newData : newData});
     }).catch(err => {
         console.log(err);
